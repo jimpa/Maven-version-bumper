@@ -1,7 +1,11 @@
 package se.tla.mavenversionbumper;
 
+import bsh.EvalError;
+import bsh.Interpreter;
+import org.apache.commons.io.FileUtils;
 import org.jdom.JDOMException;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
@@ -14,13 +18,34 @@ public class Main {
     public static final List<Module> loadedModules = new LinkedList<Module>();
 
     private static String baseDir;
+    private static String scenarioFileName;
 
-    public static void main(String args[]) throws IOException, JDOMException {
-        if (args.length != 1) {
-            System.err.println("Usage: <base directory>");
+    public static void main(String args[]) throws IOException, JDOMException, EvalError {
+        if (args.length != 2) {
+            System.err.println("Usage: <base directory> <scenarioFileName bean shell file>");
             System.exit(1);
         }
         baseDir = args[0];
+        scenarioFileName = args[1];
+
+        File scenarioFile = new File(scenarioFileName);
+        if (!(scenarioFile.isFile() && scenarioFile.canRead())) {
+            System.err.println("Scenario file " + scenarioFileName + " isn't a readable file.");
+            System.exit(1);
+        }
+
+        String scenario = FileUtils.readFileToString(scenarioFile);
+        Interpreter i = new Interpreter();
+        i.eval("importCommands(\"se.tla.mavenversionbumper.commands\")");
+        i.eval("import se.tla.mavenversionbumper.Main");
+        i.eval("import se.tla.mavenversionbumper.Module");
+        i.eval("baseDir = \"" + baseDir + "\"");
+        i.eval("load(String moduleName) { return Main.load(moduleName); }");
+        i.eval(scenario);
+
+        if (true) {
+            return;
+        }
 
         Module base = load("/");
         base.version("1.2");
@@ -39,7 +64,7 @@ public class Main {
         moduleC.updatePluginDependency(moduleB);
         moduleC.version("3.1");
 
-        Module moduleD = load("moduleC");
+        Module moduleD = load("moduleD");
         moduleD.parentVersion(base);
         moduleD.updatePluginDependency(moduleB);
         moduleD.version("3.2");
@@ -82,9 +107,16 @@ public class Main {
         saveLoadedModules();
     }
 
+    public static String getBaseDir() {
+        return baseDir;
+    }
+
+    public static void setBaseDir(String baseDir) {
+        Main.baseDir = baseDir;
+    }
+
     public static Module load(String filename) throws JDOMException, IOException {
-        Module m = new Module(baseDir, filename);
-        m.checkout();
+        Module m = new Module(baseDir, filename, null);
 
         loadedModules.add(m);
         return m;

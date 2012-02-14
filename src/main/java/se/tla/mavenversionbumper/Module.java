@@ -7,6 +7,7 @@ import org.jdom.JDOMException;
 import org.jdom.Namespace;
 import org.jdom.input.SAXBuilder;
 import org.jdom.output.XMLOutputter;
+import se.tla.mavenversionbumper.vcs.VersionControl;
 
 import java.io.File;
 import java.io.IOException;
@@ -21,9 +22,11 @@ public class Module {
     final private Element root;
     final private Namespace nameSpace;
     private final String moduleName;
+    private final VersionControl versionControl;
 
-    public Module(String baseDirName, String moduleName) throws JDOMException, IOException {
+    public Module(String baseDirName, String moduleName, VersionControl versionControl) throws JDOMException, IOException {
         this.moduleName = moduleName;
+        this.versionControl = versionControl;
         pomFile = new File(openDir(openDir(null, baseDirName), moduleName), "pom.xml");
         SAXBuilder builder = new SAXBuilder();
         document = builder.build(pomFile);
@@ -148,27 +151,39 @@ public class Module {
         version.setText(pluginModuleToUpdate.version());
     }
 
-    public void updateProperty(String property, String value) {
-        //pomConfig.setProperty("properties." + property, value);
+    public void updateProperty(String propertyName, String value) {
+        Element properties = root.getChild("properties", nameSpace);
+        if (properties == null) {
+            throw new IllegalArgumentException("No properties defined in module " + gav());
+        }
+
+        Element property = properties.getChild(propertyName, nameSpace);
+        if (property == null) {
+            throw new IllegalArgumentException("No property " + property + " defined in module " + gav());
+        }
+
+        property.setText(value);
     }
 
     public void save() throws IOException {
-        // pomConfig.save();
+        if (versionControl != null) {
+            versionControl.prepareSave(pomFile.getCanonicalPath());
+        }
         XMLOutputter o = new XMLOutputter();
         o.getFormat().setLineSeparator("\n"); // Nicht funktioniren
         FileUtils.write(pomFile, o.outputString(document), "utf-8");
     }
 
-    public void checkout() {
-        //To change body of implemented methods use File | Settings | File Templates.
+    public void checkin() throws IOException {
+        if (versionControl != null) {
+            versionControl.checkin(pomFile.getCanonicalPath());
+        }
     }
 
-    public void checkin() {
-        //To change body of implemented methods use File | Settings | File Templates.
-    }
-
-    public void label(String label) {
-        //To change body of implemented methods use File | Settings | File Templates.
+    public void label(String label) throws IOException {
+        if (versionControl != null) {
+            versionControl.label(label, pomFile.getParentFile().getCanonicalPath());
+        }
     }
 
     private Element findDependencyElement(Module moduleToFind, String ... path) {
