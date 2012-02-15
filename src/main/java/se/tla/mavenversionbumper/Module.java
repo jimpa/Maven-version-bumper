@@ -23,11 +23,16 @@ public class Module {
     final private Namespace nameSpace;
     private final String moduleName;
     private final VersionControl versionControl;
+    private String label;
 
     public Module(String baseDirName, String moduleName, VersionControl versionControl) throws JDOMException, IOException {
         this.moduleName = moduleName;
         this.versionControl = versionControl;
-        pomFile = new File(openDir(openDir(null, baseDirName), moduleName), "pom.xml");
+        File dir = openDir(null, baseDirName);
+        if (moduleName.length() > 0) {
+            dir = openDir(dir, moduleName);
+        }
+        pomFile = new File(dir, "pom.xml");
         SAXBuilder builder = new SAXBuilder();
         document = builder.build(pomFile);
         root = document.getRootElement();
@@ -172,18 +177,24 @@ public class Module {
         XMLOutputter o = new XMLOutputter();
         o.getFormat().setLineSeparator("\n"); // Nicht funktioniren
         FileUtils.write(pomFile, o.outputString(document), "utf-8");
-    }
 
-    public void checkin() throws IOException {
         if (versionControl != null) {
             versionControl.checkin(pomFile.getCanonicalPath());
         }
-    }
 
-    public void label(String label) throws IOException {
         if (versionControl != null) {
             versionControl.label(label, pomFile.getParentFile().getCanonicalPath());
         }
+    }
+
+//    public void checkin() throws IOException {
+//        if (versionControl != null) {
+//            versionControl.checkin(pomFile.getCanonicalPath());
+//        }
+//    }
+
+    public void label(String label) throws IOException {
+        this.label = label;
     }
 
     private Element findDependencyElement(Module moduleToFind, String ... path) {

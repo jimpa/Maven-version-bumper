@@ -1,18 +1,27 @@
 package se.tla.mavenversionbumper.vcs;
 
 /**
- * Created by IntelliJ IDEA.
- * User: jimpa
- * Date: 2/14/12
- * Time: 11:06 PM
- * To change this template use File | Settings | File Templates.
+ * Defines common functionality needed from a Version Control System.
  */
 public interface VersionControl {
 
+    /**
+     * This file is about to be written. Please prepare.
+     * @param fileName file to be written.
+     */
     void prepareSave(String fileName);
 
+    /**
+     * Check in this file into the VCS.
+     * @param fileName file to check in.
+     */
     void checkin(String fileName);
 
+    /**
+     * Apply this label recursively to this file tree.
+     * @param label
+     * @param directory
+     */
     void label(String label, String directory);
 
 }
