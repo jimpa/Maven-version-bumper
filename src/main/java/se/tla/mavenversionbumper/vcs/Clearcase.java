@@ -47,7 +47,6 @@ public class Clearcase extends AbstractVersionControl {
 
             execute(cmdLine, null);
 
-            System.out.println("Clearcase: checkout");
             checkedOut.add(file.getName());
         }
     }
@@ -67,7 +66,6 @@ public class Clearcase extends AbstractVersionControl {
 
         execute(cmdLine, null);
 
-        System.out.println("Clearcase: commit");
         checkedOut.remove(file.getName());
     }
 
@@ -78,7 +76,6 @@ public class Clearcase extends AbstractVersionControl {
      */
     @Override
     public void label(String label, File ... targets) {
-        System.out.println("Clearcase: label");
         // Create label type
         mklbtype(label);
         // Label

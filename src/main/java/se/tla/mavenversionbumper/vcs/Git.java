@@ -49,11 +49,7 @@ public class Git extends AbstractVersionControl {
         cmdLine.addArgument("${file}");
         cmdLine.setSubstitutionMap(map);
 
-        System.out.println("Command: " + cmdLine.toString());
-
         execute(cmdLine, parentDir);
-
-        System.out.println("Git: commit");
     }
 
     @Override
@@ -70,11 +66,7 @@ public class Git extends AbstractVersionControl {
             cmdLine.addArgument("${tag}");
             cmdLine.setSubstitutionMap(map);
 
-            System.out.println("Command: " + cmdLine.toString());
-
             execute(cmdLine, target.getParentFile());
         }
-
-        System.out.println("Git: label");
     }
 }
