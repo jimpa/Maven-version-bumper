@@ -14,17 +14,29 @@ import java.io.IOException;
 import java.util.List;
 
 /**
+ * Represents a Maven project file, pom.xml.
  *
+ * It contains methods to easily view and manipulate dependency information.
  */
 public class Module {
     final private Document document;
     final private File pomFile;
     final private Element root;
     final private Namespace nameSpace;
-    private final String moduleName;
-    private final VersionControl versionControl;
+    final private String moduleName;
+    final private VersionControl versionControl;
     private String label;
+    private String commitMessage;
+    final private String originalVersion;
 
+    /**
+     * Constructor.
+     * @param baseDirName Filename of the base directory of the Maven module.
+     * @param moduleName The symbolic name of the Maven module.
+     * @param versionControl Optional VersionControl implementation to use.
+     * @throws JDOMException
+     * @throws IOException
+     */
     public Module(String baseDirName, String moduleName, VersionControl versionControl) throws JDOMException, IOException {
         this.moduleName = moduleName;
         this.versionControl = versionControl;
@@ -32,11 +44,13 @@ public class Module {
         if (moduleName.length() > 0) {
             dir = openDir(dir, moduleName);
         }
-        pomFile = new File(dir, "pom.xml");
+        File baseDir = dir;
+        pomFile = new File(baseDir, "pom.xml");
         SAXBuilder builder = new SAXBuilder();
         document = builder.build(pomFile);
         root = document.getRootElement();
         nameSpace = root.getNamespace();
+        originalVersion = version();
     }
 
     private File openDir(File base, String name) {
@@ -52,14 +66,9 @@ public class Module {
         return dir;
     }
 
-    public String version() {
-        return myOrParent("version");
-    }
-
-    public void version(String version) {
-        root.getChild("version", nameSpace).setText(version);
-    }
-
+    /**
+     * @return GAV-coordinates. GroupId, ArtifactId, Version.
+     */
     public String gav() {
         return groupId() + ":" + artifactId() + ":" + version();
     }
@@ -68,6 +77,9 @@ public class Module {
         return myOrParent("groupId");
     }
 
+    /**
+     * @param groupId New GroupId.
+     */
     public void groupId(String groupId) {
         root.getChild("groupId", nameSpace).setText(groupId);
     }
@@ -76,18 +88,39 @@ public class Module {
         return root.getChildText("artifactId", nameSpace);
     }
 
+    /**
+     * @param artifactId New ArtifactId.
+     */
     public void artifactId(String artifactId) {
         root.getChild("artifactId", nameSpace).setText(artifactId);
+    }
+
+    public String version() {
+        return myOrParent("version");
+    }
+
+    /**
+     * @param version New Version.
+     */
+    public void version(String version) {
+        root.getChild("version", nameSpace).setText(version);
     }
 
     public String parentVersion() {
         return root.getChild("parent", nameSpace).getChildText("version", nameSpace);
     }
 
+    /**
+     * @param parentVersion New parentVersion.
+     */
     public void parentVersion(String parentVersion) {
         root.getChild("parent", nameSpace).getChild("version", nameSpace).setText(parentVersion);
     }
 
+    /**
+     * Update the parent version to that of this Module.
+     * @param parent
+     */
     public void parentVersion(Module parent) {
         parentVersion(parent.version());
     }
@@ -100,6 +133,12 @@ public class Module {
         return root.getChild("parent", nameSpace).getChildText(itemName);
     }
 
+    /**
+     * Find this module in either the modules dependency management list or in the dependency list.
+     *
+     * @param moduleToUpdate Module to find and update version for.
+     * @throws IllegalArgumentException If the moduleToUpdate can't be found in either list.
+     */
     public void updateDependency(Module moduleToUpdate) {
 
         // Look in dependencyManagement
@@ -116,26 +155,32 @@ public class Module {
 
         Element version = dep.getChild("version", nameSpace);
         if (version == null) {
-            throw new IllegalStateException("In " + gav() + ", no version defined for " + moduleToUpdate.gav() +
+            throw new IllegalArgumentException("In " + gav() + ", no version defined for " + moduleToUpdate.gav() +
             ". Probably defined elsewhere in a dependencyManagement.");
         }
 
         if (version.getText().startsWith("${") && version.getText().endsWith("}")) {
-            throw new IllegalStateException("In " + gav() + ", the dependency to " + moduleToUpdate.gav() +
+            throw new IllegalArgumentException("In " + gav() + ", the dependency to " + moduleToUpdate.gav() +
                     "'s version is controlled by a property. Use updateProperty instead.");
         }
 
         version.setText(moduleToUpdate.version());
     }
 
-    public void updatePluginDependency(Module pluginModuleToUpdate) {
+    /**
+     * Find this plugin in either the modules plugin management list or in the plugin list.
+     *
+     * @param pluginToUpdate Plugin to find and update version for.
+     * @throws IllegalArgumentException If the moduleToUpdate can't be found in either list.
+     */
+    public void updatePluginDependency(Module pluginToUpdate) {
 
         // Look in pluginManagement
-        Element dep = findDependencyElement(pluginModuleToUpdate, "build", "pluginManagement", "plugins");
+        Element dep = findDependencyElement(pluginToUpdate, "build", "pluginManagement", "plugins");
 
         if (dep == null) {
             // Look i plugins
-            dep = findDependencyElement(pluginModuleToUpdate, "build", "plugins");
+            dep = findDependencyElement(pluginToUpdate, "build", "plugins");
         }
 
         if (dep == null) {
@@ -144,18 +189,24 @@ public class Module {
 
         Element version = dep.getChild("version", nameSpace);
         if (version == null) {
-            throw new IllegalStateException("In " + gav() + ", no version defined for " + pluginModuleToUpdate.gav() +
+            throw new IllegalArgumentException("In " + gav() + ", no version defined for " + pluginToUpdate.gav() +
                     ". Probably defined elsewhere in a pluginManagement.");
         }
 
         if (version.getText().startsWith("${") && version.getText().endsWith("}")) {
-            throw new IllegalStateException("In " + gav() + ", the plugin dependency to " + pluginModuleToUpdate.gav() +
+            throw new IllegalArgumentException("In " + gav() + ", the plugin dependency to " + pluginToUpdate.gav() +
                     "'s version is controlled by a property. Use updateProperty instead.");
         }
 
-        version.setText(pluginModuleToUpdate.version());
+        version.setText(pluginToUpdate.version());
     }
 
+    /**
+     * Find the named property and update its value.
+     * @param propertyName Name.
+     * @param value Value.
+     * @throws IllegalArgumentException if named property can't be found.
+     */
     public void updateProperty(String propertyName, String value) {
         Element properties = root.getChild("properties", nameSpace);
         if (properties == null) {
@@ -170,31 +221,51 @@ public class Module {
         property.setText(value);
     }
 
+    /**
+     * Save this module back to its original pom.xml file.
+     *
+     * If a VersionControl was provided while creating this Module, the pom.xml is first
+     * commited and then, optionally, labeled.
+     *
+     * @throws IOException in case of IO-related problems.
+     */
     public void save() throws IOException {
         if (versionControl != null) {
-            versionControl.prepareSave(pomFile.getCanonicalPath());
+            versionControl.prepareSave(pomFile);
         }
         XMLOutputter o = new XMLOutputter();
         o.getFormat().setLineSeparator("\n"); // Nicht funktioniren
         FileUtils.write(pomFile, o.outputString(document), "utf-8");
 
         if (versionControl != null) {
-            versionControl.checkin(pomFile.getCanonicalPath());
+            if (commitMessage == null) {
+                commitMessage = "Bump " + originalVersion + " -> " + version();
+            }
+            versionControl.commit(pomFile, commitMessage);
         }
 
         if (versionControl != null) {
-            versionControl.label(label, pomFile.getParentFile().getCanonicalPath());
+            versionControl.label(label, pomFile.getParentFile());
         }
     }
 
-//    public void checkin() throws IOException {
-//        if (versionControl != null) {
-//            versionControl.checkin(pomFile.getCanonicalPath());
-//        }
-//    }
-
+    /**
+     * Apply this label to the Module when it is saved. Requires that a VersionControl was provided to work.
+     * @param label
+     * @throws IOException
+     */
     public void label(String label) throws IOException {
         this.label = label;
+    }
+
+    /**
+     * Use this commit message if a commit to VersionControl is performed. If no custom message is provided,
+     * a default message is used.
+     * @param commitMessage
+     * @throws IOException
+     */
+    public void commitMessage(String commitMessage) throws IOException {
+        this.commitMessage = commitMessage;
     }
 
     private Element findDependencyElement(Module moduleToFind, String ... path) {
@@ -219,6 +290,7 @@ public class Module {
         return null;
     }
 
+    @Override
     public String toString() {
         return moduleName;
     }

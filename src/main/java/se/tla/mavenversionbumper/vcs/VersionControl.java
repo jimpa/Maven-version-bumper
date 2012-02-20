@@ -1,5 +1,7 @@
 package se.tla.mavenversionbumper.vcs;
 
+import java.io.File;
+
 /**
  * Defines common functionality needed from a Version Control System.
  */
@@ -7,21 +9,23 @@ public interface VersionControl {
 
     /**
      * This file is about to be written. Please prepare.
-     * @param fileName file to be written.
+     * @param file file to be written.
      */
-    void prepareSave(String fileName);
+    void prepareSave(File file);
 
     /**
-     * Check in this file into the VCS.
-     * @param fileName file to check in.
+     * Commit this file into the VCS.
+     * @param file file to check in.
+     * @param message Commit message. Can't be null or empty.
+     * @throws IllegalArgumentException If message is null or empty, or if fileName doesn't point to an existing file.
      */
-    void checkin(String fileName);
+    void commit(File file, String message);
 
     /**
-     * Apply this label recursively to this file tree.
+     * Apply this label recursively to these file targets.
      * @param label
-     * @param directory
+     * @param targets
      */
-    void label(String label, String directory);
+    void label(String label, File ... targets);
 
 }
