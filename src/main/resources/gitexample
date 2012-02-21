@@ -1,0 +1,3 @@
+versioncontrol=git
+#
+git.path=/usr/local/git/bin/git

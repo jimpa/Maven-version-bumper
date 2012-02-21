@@ -1,0 +1,36 @@
+
+
+base = load("");
+base.version("1.2");
+base.label("BASE_1_2");
+
+moduleA = load("moduleA");
+moduleA.parentVersion(base);
+moduleA.version("9.1-SNAPSHOT");
+moduleA.label("MODULEA_9_1");
+
+Module moduleB = load("moduleB");
+moduleB.parentVersion(base);
+moduleB.updateDependency(moduleA);
+moduleB.version("3.1");
+moduleB.label("MODULEB_3_1");
+
+Module moduleC = load("moduleC");
+moduleC.parentVersion(base);
+moduleC.updatePluginDependency(moduleB);
+moduleC.version("3.1");
+moduleC.label("MODULEC_3_1");
+
+Module moduleD = load("moduleD");
+moduleD.parentVersion(base);
+moduleD.updatePluginDependency(moduleB);
+moduleD.version("3.2");
+moduleD.label("MODULED_3_2");
+
+print(base.gav());
+print(moduleA.gav());
+print(moduleB.gav());
+print(moduleC.gav());
+print(moduleD.gav());
+
+saveLoadedModules();

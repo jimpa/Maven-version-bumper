@@ -1,0 +1,3 @@
+versioncontrol=clearcase
+#
+cleartool.path=/bin/echo
