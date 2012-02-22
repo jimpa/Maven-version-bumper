@@ -130,7 +130,11 @@ public class Module {
         if (item != null) {
             return item;
         }
-        return root.getChild("parent", nameSpace).getChildText(itemName);
+        Element parent = root.getChild("parent", nameSpace);
+        if (parent == null) {
+            return null;
+        }
+        return parent.getChildText(itemName, nameSpace);
     }
 
     /**
