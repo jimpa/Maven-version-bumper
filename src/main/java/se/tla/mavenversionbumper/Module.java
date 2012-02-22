@@ -25,9 +25,10 @@ public class Module {
     final private Namespace nameSpace;
     final private String moduleName;
     final private VersionControl versionControl;
+    final private String originalVersion;
     private String label;
     private String commitMessage;
-    final private String originalVersion;
+    private boolean labelOnlyPomXml = false;
 
     /**
      * Constructor.
@@ -249,7 +250,7 @@ public class Module {
         }
 
         if (versionControl != null) {
-            versionControl.label(label, pomFile.getParentFile());
+            versionControl.label(label, (labelOnlyPomXml ? pomFile : pomFile.getParentFile()));
         }
     }
 
@@ -297,5 +298,13 @@ public class Module {
     @Override
     public String toString() {
         return moduleName;
+    }
+
+    public boolean labelOnlyPomXml() {
+        return labelOnlyPomXml;
+    }
+
+    public void labelOnlyPomXml(boolean labelOnlyPomXml) {
+        this.labelOnlyPomXml = labelOnlyPomXml;
     }
 }
