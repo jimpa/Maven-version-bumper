@@ -74,7 +74,8 @@ public class Main {
             i.eval("import se.tla.mavenversionbumper.Main");
             i.eval("import se.tla.mavenversionbumper.Module");
             i.eval("baseDir = \"" + baseDir + "\"");
-            i.eval("load(String moduleName) { return Main.load(moduleName); }");
+            i.eval("load(String moduleName) { return Main.load(moduleName, true); }");
+            i.eval("loadReadOnly(String moduleName) { return Main.load(moduleName, false); }");
             i.eval("saveLoadedModules() { Main.saveLoadedModules(); }");
             i.eval(scenario);
         } catch (EvalError evalError) {
@@ -87,20 +88,25 @@ public class Main {
     /**
      * Create a Module located by this filename that is a directory relative to the baseDir.
      *
-     * @param filename
-     * @return
+     * If the Module is opened for writing, it is saved during a call ti the saveLoadedModules().
+     *
+     * @param moduleDirectoryName
+     * @param openForWriting
+     * @return Newly created Module.
      * @throws JDOMException
      * @throws IOException
      */
-    public static Module load(String filename) throws JDOMException, IOException {
-        Module m = new Module(baseDir, filename, versionControl);
+    public static Module load(String moduleDirectoryName, boolean openForWriting) throws JDOMException, IOException {
+        Module m = new Module(baseDir, moduleDirectoryName, versionControl);
 
-        loadedModules.add(m);
+        if (openForWriting) {
+            loadedModules.add(m);
+        }
         return m;
     }
 
     /**
-     * Call save() on all Modules loaded by the load() method.
+     * Call save() on all Modules loaded by the load() method that was loaded for writing.
      * @throws IOException
      */
     public static void saveLoadedModules() throws IOException {
