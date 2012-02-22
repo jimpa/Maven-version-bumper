@@ -88,25 +88,25 @@ public class Main {
     /**
      * Create a Module located by this filename that is a directory relative to the baseDir.
      *
-     * If the Module is opened for writing, it is saved during a call ti the saveLoadedModules().
+     * If the Module is opened for updating, it is saved during a call ti the saveLoadedModules().
      *
      * @param moduleDirectoryName
-     * @param openForWriting
+     * @param openForUpdate
      * @return Newly created Module.
      * @throws JDOMException
      * @throws IOException
      */
-    public static Module load(String moduleDirectoryName, boolean openForWriting) throws JDOMException, IOException {
+    public static Module load(String moduleDirectoryName, boolean openForUpdate) throws JDOMException, IOException {
         Module m = new Module(baseDir, moduleDirectoryName, versionControl);
 
-        if (openForWriting) {
+        if (openForUpdate) {
             loadedModules.add(m);
         }
         return m;
     }
 
     /**
-     * Call save() on all Modules loaded by the load() method that was loaded for writing.
+     * Call save() on all Modules loaded by the load() method that was opened for update.
      * @throws IOException
      */
     public static void saveLoadedModules() throws IOException {
