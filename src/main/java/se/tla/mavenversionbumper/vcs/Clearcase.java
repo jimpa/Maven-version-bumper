@@ -1,9 +1,13 @@
 package se.tla.mavenversionbumper.vcs;
 
-import org.apache.commons.exec.CommandLine;
-
 import java.io.File;
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Properties;
+import java.util.Set;
+
+import org.apache.commons.exec.CommandLine;
 
 /**
  * Implements VersionControl for the Clearcase versioning system.
@@ -36,12 +40,11 @@ public class Clearcase extends AbstractVersionControl {
     public void prepareSave(File file) {
         if (! checkedOut.contains(file.getName())) {
             Map<String, Object> map = new HashMap<String, Object>();
-            map.put("file", file.getName());
+            map.put("file", file);
 
             CommandLine cmdLine = new CommandLine(commandPath);
             cmdLine.addArgument("checkout");
-            cmdLine.addArgument("-c");
-            cmdLine.addArgument("\"\"");
+            cmdLine.addArgument("-nc");
             cmdLine.addArgument("${file}");
             cmdLine.setSubstitutionMap(map);
 
@@ -55,12 +58,16 @@ public class Clearcase extends AbstractVersionControl {
     public void commit(File file, String message) {
         Map<String, Object> map = new HashMap<String, Object>();
         map.put("file", file.getName());
-        map.put("comment", message);
 
         CommandLine cmdLine = new CommandLine(commandPath);
         cmdLine.addArgument("checkin");
-        cmdLine.addArgument("-c");
-        cmdLine.addArgument("${comment}");
+        if (message != null && message.length() > 0) {
+        	cmdLine.addArgument("-c");
+        	cmdLine.addArgument("${comment}");
+        	map.put("comment", message);
+        } else {
+            cmdLine.addArgument("-nc");
+        }
         cmdLine.addArgument("${file}");
         cmdLine.setSubstitutionMap(map);
 
@@ -88,8 +95,8 @@ public class Clearcase extends AbstractVersionControl {
 
         CommandLine cmdLine = new CommandLine(commandPath);
         cmdLine.addArgument("mklbtype");
-        cmdLine.addArgument("-c");
-        cmdLine.addArgument("\"\"");
+        cmdLine.addArgument("-replace");
+        cmdLine.addArgument("-nc");
         cmdLine.addArgument("${label}");
         cmdLine.setSubstitutionMap(map);
 
@@ -103,6 +110,9 @@ public class Clearcase extends AbstractVersionControl {
 
         CommandLine cmdLine = new CommandLine(commandPath);
         cmdLine.addArgument("mklabel");
+        cmdLine.addArgument("-recurse");
+        cmdLine.addArgument("-replace");
+        cmdLine.addArgument("-nc");
         cmdLine.addArgument("${label}");
 
         for (File target : targets) {
