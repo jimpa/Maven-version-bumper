@@ -18,6 +18,10 @@
         </dependencies>
     </dependencyManagement>
 
+    <properties>
+        <niceProp>niceValue</niceProp>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>org.apache.commons</groupId>

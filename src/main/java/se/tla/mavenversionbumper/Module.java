@@ -108,14 +108,26 @@ public class Module {
     }
 
     public String parentVersion() {
-        return root.getChild("parent", nameSpace).getChildText("version", nameSpace);
+        Element parent = root.getChild("parent", nameSpace);
+        if (parent == null) {
+            return null;
+        }
+        return parent.getChildText("version", nameSpace);
     }
 
     /**
      * @param parentVersion New parentVersion.
      */
     public void parentVersion(String parentVersion) {
-        root.getChild("parent", nameSpace).getChild("version", nameSpace).setText(parentVersion);
+        Element parent = root.getChild("parent", nameSpace);
+        if (parent == null) {
+            throw new IllegalArgumentException("No parent defined in module");
+        }
+        Element version = parent.getChild("version", nameSpace);
+        if (version == null) {
+            throw new IllegalStateException("No version defined for parent.");
+        }
+        version.setText(parentVersion);
     }
 
     /**
