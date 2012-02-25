@@ -30,6 +30,14 @@ public class ModuleTest {
     }
 
     @Test
+    public void testItemsFromParent() throws Exception {
+        Module subject = new Module("target/test-classes", "withparent", null);
+
+        Assert.assertEquals("se.tla.maven", subject.groupId());
+        Assert.assertEquals("0.1-SNAPSHOT", subject.version());
+    }
+
+    @Test
     public void testParentVersionWithNoParent() throws Exception {
         Module subject = new Module("target/test-classes", "simple", null);
 
