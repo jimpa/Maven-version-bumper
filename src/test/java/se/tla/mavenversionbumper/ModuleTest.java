@@ -1,11 +1,7 @@
 package se.tla.mavenversionbumper;
 
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
 import org.junit.Assert;
 import org.junit.Test;
-
-import java.io.File;
 
 /**
  * Unit tests for the Module class.
@@ -82,5 +78,17 @@ public class ModuleTest {
 
         Module testSubject = new Module("target/test-classes", "simple", null);
         Assert.assertEquals("2.0", testSubject.version());
+    }
+
+    @Test
+    public void testTest() throws Exception {
+        ModuleTestTemplate.template("simple", "simple.xml", new ModuleTinker() {
+            @Override
+            public void tink(Module subject) {
+                subject.groupId("se.tla");
+                subject.artifactId("kaffekokare");
+                subject.version("1.0");
+            }
+        });
     }
 }
