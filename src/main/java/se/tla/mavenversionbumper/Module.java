@@ -1,5 +1,9 @@
 package se.tla.mavenversionbumper;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.List;
+
 import org.apache.commons.io.FileUtils;
 import org.jdom.Document;
 import org.jdom.Element;
@@ -7,11 +11,8 @@ import org.jdom.JDOMException;
 import org.jdom.Namespace;
 import org.jdom.input.SAXBuilder;
 import org.jdom.output.XMLOutputter;
-import se.tla.mavenversionbumper.vcs.VersionControl;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.List;
+import se.tla.mavenversionbumper.vcs.VersionControl;
 
 /**
  * Represents a Maven project file, pom.xml.
@@ -254,7 +255,9 @@ public class Module {
             versionControl.prepareSave(pomFile);
         }
         XMLOutputter o = new XMLOutputter();
+        // TODO Make sure that the line endings are preserved.
         o.getFormat().setLineSeparator("\n"); // Nicht funktioniren
+        // TODO Make sure that the character encoding of the pom.xml is preserved.
         FileUtils.write(pomFile, o.outputString(document), "utf-8");
 
         if (versionControl != null) {
@@ -262,10 +265,10 @@ public class Module {
                 commitMessage = "Bump " + originalVersion + " -> " + version();
             }
             versionControl.commit(pomFile, commitMessage);
-        }
 
-        if (versionControl != null) {
-            versionControl.label(label, (labelOnlyPomXml ? pomFile : pomFile.getParentFile()));
+            if (label != null) {
+            	versionControl.label(label, (labelOnlyPomXml ? pomFile : pomFile.getParentFile()));
+            }
         }
     }
 
