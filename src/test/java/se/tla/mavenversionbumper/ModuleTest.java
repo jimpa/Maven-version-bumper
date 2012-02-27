@@ -130,8 +130,56 @@ public class ModuleTest {
     }
 
     @Test
-    public void testCommitMessage() throws Exception {
-        // TODO
+    public void testCommitDefaultMessage() throws Exception {
+        final AtomicBoolean commitWasCalled = new AtomicBoolean(false);
+        Module subject = new Module("target/test-classes", "simple", new VersionControl() {
+            @Override
+            public void prepareSave(File file) {
+            }
+
+            @Override
+            public void commit(File file, String message) {
+                Assert.assertTrue(message.contains("Bump"));
+                Assert.assertTrue(message.contains("1.0-SNAPSHOT"));
+                Assert.assertTrue(message.contains("99"));
+                commitWasCalled.set(true);
+            }
+
+            @Override
+            public void label(String label, File... targets) {
+            }
+        });
+
+        subject.version("99");
+        subject.save();
+
+        Assert.assertTrue(commitWasCalled.get());
+    }
+
+    @Test
+    public void testCommitCustomMessage() throws Exception {
+        final String COMMITMESSAGE = "commitmsg";
+        final AtomicBoolean commitWasCalled = new AtomicBoolean(false);
+        Module subject = new Module("target/test-classes", "simple", new VersionControl() {
+            @Override
+            public void prepareSave(File file) {
+            }
+
+            @Override
+            public void commit(File file, String message) {
+                Assert.assertEquals(COMMITMESSAGE, message);
+                commitWasCalled.set(true);
+            }
+
+            @Override
+            public void label(String label, File... targets) {
+            }
+        });
+
+        subject.commitMessage(COMMITMESSAGE);
+        subject.save();
+
+        Assert.assertTrue(commitWasCalled.get());
     }
 
     @Test
