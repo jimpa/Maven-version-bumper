@@ -1,17 +1,24 @@
 package se.tla.mavenversionbumper;
 
-import bsh.EvalError;
-import bsh.Interpreter;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.input.AutoCloseInputStream;
 import org.jdom.JDOMException;
+
 import se.tla.mavenversionbumper.vcs.AbstractVersionControl;
 import se.tla.mavenversionbumper.vcs.Clearcase;
 import se.tla.mavenversionbumper.vcs.Git;
 import se.tla.mavenversionbumper.vcs.VersionControl;
-
-import java.io.*;
-import java.util.*;
+import bsh.EvalError;
+import bsh.Interpreter;
 
 /**
  * Command line interface for the version bumper.
@@ -113,5 +120,6 @@ public class Main {
         for (Module m : loadedModules) {
             m.save();
         }
+        loadedModules.clear();
     }
 }
