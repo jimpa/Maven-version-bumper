@@ -95,7 +95,6 @@ public class Clearcase extends AbstractVersionControl {
 
         CommandLine cmdLine = new CommandLine(commandPath);
         cmdLine.addArgument("mklbtype");
-        cmdLine.addArgument("-replace");
         cmdLine.addArgument("-nc");
         cmdLine.addArgument("${label}");
         cmdLine.setSubstitutionMap(map);
