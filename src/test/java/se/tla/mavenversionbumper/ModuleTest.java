@@ -100,7 +100,24 @@ public class ModuleTest {
 
     @Test
     public void testUpdateProperty() throws Exception {
-        // TODO
+        ModuleTestTemplate.template("withproperty", "withproperty.xml", new ModuleTinker() {
+            @Override
+            public void tink(Module subject) {
+                subject.updateProperty("coffee", "dark");
+            }
+        });
+
+        try {
+            ModuleTestTemplate.template("withproperty", "withproperty.xml", new ModuleTinker() {
+                @Override
+                public void tink(Module subject) {
+                    subject.updateProperty("tea", "lipton");
+                }
+            });
+            Assert.fail();
+        } catch (IllegalArgumentException e) {
+            // Expected
+        }
     }
 
     @Test

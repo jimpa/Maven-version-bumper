@@ -235,7 +235,7 @@ public class Module {
 
         Element property = properties.getChild(propertyName, nameSpace);
         if (property == null) {
-            throw new IllegalArgumentException("No property " + property + " defined in module " + gav());
+            throw new IllegalArgumentException("No property " + propertyName + " defined in module " + gav());
         }
 
         property.setText(value);
