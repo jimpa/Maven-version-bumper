@@ -73,7 +73,12 @@ public class ModuleTest {
 
     @Test
     public void testSetParentVersion() throws Exception {
-        // TODO
+        ModuleTestTemplate.template("withparent", "withparent.xml", new ModuleTinker() {
+            @Override
+            public void tink(Module subject) {
+                subject.parentVersion("4711");
+            }
+        });
     }
 
     @Test
