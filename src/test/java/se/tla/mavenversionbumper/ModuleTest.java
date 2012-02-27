@@ -2,6 +2,10 @@ package se.tla.mavenversionbumper;
 
 import org.junit.Assert;
 import org.junit.Test;
+import se.tla.mavenversionbumper.vcs.VersionControl;
+
+import java.io.File;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Unit tests for the Module class.
@@ -10,7 +14,7 @@ public class ModuleTest {
 
     @Test
     public void testSimple() throws Exception {
-        Module subject = new Module("target/test-classes", "simple", null);
+        Module subject = new Module("target/test-classes/sources", "simple", null);
 
         Assert.assertEquals("se.tla.maven", subject.groupId());
         Assert.assertEquals("versionbumper", subject.artifactId());
@@ -68,20 +72,12 @@ public class ModuleTest {
     }
 
     @Test
-    public void testSave() throws Exception {
-        Module subject = new Module("target/test-classes", "simple", null);
-
-        Assert.assertEquals("1.0-SNAPSHOT", subject.version());
-
-        subject.version("2.0");
-        subject.save();
-
-        Module testSubject = new Module("target/test-classes", "simple", null);
-        Assert.assertEquals("2.0", testSubject.version());
+    public void testSetParentVersion() throws Exception {
+        // TODO
     }
 
     @Test
-    public void testTest() throws Exception {
+    public void testSimpleSave() throws Exception {
         ModuleTestTemplate.template("simple", "simple.xml", new ModuleTinker() {
             @Override
             public void tink(Module subject) {
@@ -90,5 +86,56 @@ public class ModuleTest {
                 subject.version("1.0");
             }
         });
+    }
+
+    @Test
+    public void testUpdateDependency() throws Exception {
+        // TODO
+    }
+
+    @Test
+    public void testUpdatePluginDependency() throws Exception {
+        // TODO
+    }
+
+    @Test
+    public void testUpdateProperty() throws Exception {
+        // TODO
+    }
+
+    @Test
+    public void testLabel() throws Exception {
+        final String LABELMESSAGE = "labelmsg";
+        final AtomicBoolean labelWasCalled = new AtomicBoolean(false);
+        Module subject = new Module("target/test-classes", "simple", new VersionControl() {
+            @Override
+            public void prepareSave(File file) {
+            }
+
+            @Override
+            public void commit(File file, String message) {
+            }
+
+            @Override
+            public void label(String label, File... targets) {
+                Assert.assertEquals(LABELMESSAGE, label);
+                labelWasCalled.set(true);
+            }
+        });
+
+        subject.label(LABELMESSAGE);
+        subject.save();
+
+        Assert.assertTrue(labelWasCalled.get());
+    }
+
+    @Test
+    public void testCommitMessage() throws Exception {
+        // TODO
+    }
+
+    @Test
+    public void testLabelOnlyPomXml() throws Exception {
+        // TODO
     }
 }

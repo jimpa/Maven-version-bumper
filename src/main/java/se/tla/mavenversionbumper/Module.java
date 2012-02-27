@@ -32,6 +32,7 @@ public class Module {
 
     /**
      * Constructor.
+     *
      * @param baseDirName Filename of the base directory of the Maven module.
      * @param moduleName The symbolic name of the Maven module.
      * @param versionControl Optional VersionControl implementation to use.
@@ -132,6 +133,7 @@ public class Module {
 
     /**
      * Update the parent version to that of this Module.
+     *
      * @param parent
      */
     public void parentVersion(Module parent) {
@@ -220,6 +222,7 @@ public class Module {
 
     /**
      * Find the named property and update its value.
+     *
      * @param propertyName Name.
      * @param value Value.
      * @throws IllegalArgumentException if named property can't be found.
@@ -268,6 +271,7 @@ public class Module {
 
     /**
      * Apply this label to the Module when it is saved. Requires that a VersionControl was provided to work.
+     *
      * @param label
      * @throws IOException
      */
@@ -278,6 +282,7 @@ public class Module {
     /**
      * Use this commit message if a commit to VersionControl is performed. If no custom message is provided,
      * a default message is used.
+     *
      * @param commitMessage
      * @throws IOException
      */
@@ -316,6 +321,14 @@ public class Module {
         return labelOnlyPomXml;
     }
 
+    /**
+     * Controls how much will be labeled if labeling is required.
+     *
+     * Please observe that this functionality isn't implemented in all VersionControl implementations since
+     * they simply don't support labeling of subtrees.
+     *
+     * @param labelOnlyPomXml If false (default) label whole Module recursively, if true only label the pom.xml.
+     */
     public void labelOnlyPomXml(boolean labelOnlyPomXml) {
         this.labelOnlyPomXml = labelOnlyPomXml;
     }
