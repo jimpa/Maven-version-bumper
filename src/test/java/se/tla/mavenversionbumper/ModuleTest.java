@@ -176,7 +176,13 @@ public class ModuleTest {
         });
 
         subject.version("99");
-        subject.save();
+        Module original = new Module("target/test-classes", "simple", null);
+
+        try {
+            subject.save();
+        } finally {
+            original.save();
+        }
 
         Assert.assertTrue(commitWasCalled.get());
     }
