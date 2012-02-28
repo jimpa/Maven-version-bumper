@@ -57,7 +57,7 @@ public class Clearcase extends AbstractVersionControl {
     @Override
     public void commit(File file, String message) {
         Map<String, Object> map = new HashMap<String, Object>();
-        map.put("file", file.getName());
+        map.put("file", file);
 
         CommandLine cmdLine = new CommandLine(commandPath);
         cmdLine.addArgument("checkin");
