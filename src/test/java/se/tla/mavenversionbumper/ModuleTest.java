@@ -111,7 +111,10 @@ public class ModuleTest {
                 subject.updateProperty("coffee", "dark");
             }
         });
+    }
 
+    @Test
+    public void testUpdateUnknownProperty() throws Exception {
         try {
             ModuleTestTemplate.template("withproperty", "withproperty.xml", new ModuleTinker() {
                 @Override
