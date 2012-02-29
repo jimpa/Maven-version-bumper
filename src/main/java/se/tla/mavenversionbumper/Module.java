@@ -315,24 +315,20 @@ public class Module {
         return null;
     }
 
-    @Override
-    public String toString() {
-        return moduleName;
-    }
-
-    public boolean labelOnlyPomXml() {
-        return labelOnlyPomXml;
-    }
-
     /**
      * Controls how much will be labeled if labeling is required.
      *
      * Please observe that this functionality isn't implemented in all VersionControl implementations since
-     * they simply don't support labeling of subtrees.
+     * they simply don't support labeling of sub trees.
      *
      * @param labelOnlyPomXml If false (default) label whole Module recursively, if true only label the pom.xml.
      */
     public void labelOnlyPomXml(boolean labelOnlyPomXml) {
         this.labelOnlyPomXml = labelOnlyPomXml;
+    }
+
+    @Override
+    public String toString() {
+        return moduleName;
     }
 }
