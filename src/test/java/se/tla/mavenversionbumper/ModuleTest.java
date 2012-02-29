@@ -95,7 +95,13 @@ public class ModuleTest {
 
     @Test
     public void testUpdateDependency() throws Exception {
-        // TODO
+        final Module depmod = new Module("target/test-classes", "simple", null);
+        ModuleTestTemplate.template("dependency", "dependency.xml", new ModuleTinker() {
+            @Override
+            public void tink(Module subject) {
+                subject.updateDependency(depmod);
+            }
+        });
     }
 
     @Test
