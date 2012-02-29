@@ -117,7 +117,24 @@ public class ModuleTest {
 
     @Test
     public void testUpdatePluginDependency() throws Exception {
-        // TODO
+        final Module depmod = new Module("target/test-classes", "simple", null);
+        ModuleTestTemplate.template("pluginDependency", "pluginDependency.xml", new ModuleTinker() {
+            @Override
+            public void tink(Module subject) {
+                subject.updatePluginDependency(depmod);
+            }
+        });
+    }
+
+    @Test
+    public void testUpdatePluginDependencyManagement() throws Exception {
+        final Module depmod = new Module("target/test-classes", "simple", null);
+        ModuleTestTemplate.template("pluginManagement", "pluginManagement.xml", new ModuleTinker() {
+            @Override
+            public void tink(Module subject) {
+                subject.updatePluginDependency(depmod);
+            }
+        });
     }
 
     @Test
