@@ -178,11 +178,50 @@ public class ModuleTest {
             @Override
             public void label(String label, File... targets) {
                 Assert.assertEquals(LABELMESSAGE, label);
+
+                Assert.assertEquals(1, targets.length);
+                File target = targets[0];
+
+                Assert.assertEquals(new File("target/test-classes/simple"), target);
+
                 labelWasCalled.set(true);
             }
         });
 
         subject.label(LABELMESSAGE);
+        subject.save();
+
+        Assert.assertTrue(labelWasCalled.get());
+    }
+
+    @Test
+    public void testLabelOnlyPomXml() throws Exception {
+        final String LABELMESSAGE = "labelmsg";
+        final AtomicBoolean labelWasCalled = new AtomicBoolean(false);
+        Module subject = new Module("target/test-classes", "simple", new VersionControl() {
+            @Override
+            public void prepareSave(File file) {
+            }
+
+            @Override
+            public void commit(File file, String message) {
+            }
+
+            @Override
+            public void label(String label, File... targets) {
+                Assert.assertEquals(LABELMESSAGE, label);
+
+                Assert.assertEquals(1, targets.length);
+                File target = targets[0];
+
+                Assert.assertEquals(new File("target/test-classes/simple/pom.xml"), target);
+
+                labelWasCalled.set(true);
+            }
+        });
+
+        subject.label(LABELMESSAGE);
+        subject.labelOnlyPomXml(true);
         subject.save();
 
         Assert.assertTrue(labelWasCalled.get());
@@ -245,10 +284,5 @@ public class ModuleTest {
         subject.save();
 
         Assert.assertTrue(commitWasCalled.get());
-    }
-
-    @Test
-    public void testLabelOnlyPomXml() throws Exception {
-        // TODO
     }
 }
