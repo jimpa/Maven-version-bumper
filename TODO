@@ -1,0 +1,16 @@
+Thing coming in the near future
+===============================
+
+Version bumper has been released as 1.0 and through that process a few short comings has been identified that needs
+to be fixed for it to be the tool that the author envisioned it to be.
+
+1 - Bug: labeling of the base of a multi-module project mixes up what commit gets the label in the sub modules.
+  The cause for this is that all VCS is done within the Module instances save method, and since these are not aware
+  of each other, labeling can sometimes be performed before all pom.xml-files has been committed.
+
+2 - Feature: scenarios needs to be restartable and the steps already completed needs to be skipped.
+  If during a run of a scenario somethings breaks, it should be easy to just resume the scenario from where it broke.
+
+3 - More version control systems needs to be implemented.
+  * Subversion
+  * CVS (?)
