@@ -16,7 +16,9 @@
 
 package se.tla.mavenversionbumper.vcs;
 
-import java.io.File;
+import se.tla.mavenversionbumper.Module;
+
+import java.util.Collection;
 
 /**
  * Defines common functionality needed from a Version Control System.
@@ -24,24 +26,36 @@ import java.io.File;
 public interface VersionControl {
 
     /**
-     * This file is about to be written. Please prepare.
-     * @param file file to be written.
+     * This module is about to be written. Please prepare.
+     * @param module Module.
      */
-    void prepareSave(File file);
+    void prepareSave(Module module);
 
     /**
-     * Commit this file into the VCS.
-     * @param file file to check in.
-     * @param message Commit message. Can't be null or empty.
-     * @throws IllegalArgumentException If message is null or empty, or if fileName doesn't point to an existing file.
+     * Use the Version Control System to revert any changes made to this module.
+     *
+     * This method only backs out changes that havn't been commited and it does not
+     * affect any labels that has been applied.
+     *
+     * @param module Revert changes for this module.
      */
-    void commit(File file, String message);
+    void restore(Module module);
 
     /**
-     * Apply this label recursively to these file targets.
-     * @param label
-     * @param targets
+     * Commit these modules to the Version Control System.
+     * @param module Module.
      */
-    void label(String label, File ... targets);
+    void commit(Module module);
 
+    /**
+     * Apply any labels that has been registered in these modules.
+     * @param modules Modules.
+     */
+    void label(Module ... modules);
+
+    /**
+     * Apply any labels that has been registered in these modules.
+     * @param modules Modules.
+     */
+    void label(Collection<Module> modules);
 }

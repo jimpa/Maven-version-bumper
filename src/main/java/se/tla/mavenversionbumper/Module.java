@@ -28,8 +28,6 @@ import org.jdom.Namespace;
 import org.jdom.input.SAXBuilder;
 import org.jdom.output.XMLOutputter;
 
-import se.tla.mavenversionbumper.vcs.VersionControl;
-
 /**
  * Represents a Maven project file, pom.xml.
  *
@@ -41,7 +39,6 @@ public class Module {
     final private Element root;
     final private Namespace nameSpace;
     final private String moduleName;
-    final private VersionControl versionControl;
     final private String originalVersion;
     private String label;
     private String commitMessage;
@@ -52,13 +49,11 @@ public class Module {
      *
      * @param baseDirName Filename of the base directory of the Maven module.
      * @param moduleName The symbolic name of the Maven module.
-     * @param versionControl Optional VersionControl implementation to use.
      * @throws JDOMException
      * @throws IOException
      */
-    public Module(String baseDirName, String moduleName, VersionControl versionControl) throws JDOMException, IOException {
+    public Module(String baseDirName, String moduleName) throws JDOMException, IOException {
         this.moduleName = moduleName;
-        this.versionControl = versionControl;
         File dir = openDir(null, baseDirName);
         if (moduleName.length() > 0) {
             dir = openDir(dir, moduleName);
@@ -122,6 +117,9 @@ public class Module {
      * @param version New Version.
      */
     public void version(String version) {
+        if (commitMessage == null) {
+            commitMessage = "Bump " + originalVersion + " -> " + version;
+        }
         root.getChild("version", nameSpace).setText(version);
     }
 
@@ -267,25 +265,11 @@ public class Module {
      * @throws IOException in case of IO-related problems.
      */
     public void save() throws IOException {
-        if (versionControl != null) {
-            versionControl.prepareSave(pomFile);
-        }
         XMLOutputter o = new XMLOutputter();
         // TODO Make sure that the line endings are preserved.
         o.getFormat().setLineSeparator("\n"); // Nicht funktioniren
         // TODO Make sure that the character encoding of the pom.xml is preserved.
         FileUtils.write(pomFile, o.outputString(document), "utf-8");
-
-        if (versionControl != null) {
-            if (commitMessage == null) {
-                commitMessage = "Bump " + originalVersion + " -> " + version();
-            }
-            versionControl.commit(pomFile, commitMessage);
-
-            if (label != null) {
-            	versionControl.label(label, (labelOnlyPomXml ? pomFile : pomFile.getParentFile()));
-            }
-        }
     }
 
     /**
@@ -298,6 +282,10 @@ public class Module {
         this.label = label;
     }
 
+    public String label() {
+        return label;
+    }
+
     /**
      * Use this commit message if a commit to VersionControl is performed. If no custom message is provided,
      * a default message is used.
@@ -307,6 +295,13 @@ public class Module {
      */
     public void commitMessage(String commitMessage) throws IOException {
         this.commitMessage = commitMessage;
+    }
+
+    /**
+     * @return The message to use during a commit.
+     */
+    public String commitMessage() {
+        return commitMessage;
     }
 
     private Element findDependencyElement(Module moduleToFind, String ... path) {
@@ -341,6 +336,20 @@ public class Module {
      */
     public void labelOnlyPomXml(boolean labelOnlyPomXml) {
         this.labelOnlyPomXml = labelOnlyPomXml;
+    }
+
+    /**
+     * @return If true, only label the pom.xml, if false, label whole file tree recursively, including any sub module..
+     */
+    public boolean labelOnlyPomXml() {
+        return labelOnlyPomXml;
+    }
+
+    /**
+     * @return The modules pom.xml file.
+     */
+    public File pomFile() {
+        return pomFile;
     }
 
     @Override

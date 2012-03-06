@@ -18,10 +18,13 @@ package se.tla.mavenversionbumper.vcs;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.Collection;
 
 import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.DefaultExecutor;
 import org.apache.commons.exec.ExecuteWatchdog;
+import se.tla.mavenversionbumper.Module;
 
 /**
  * Common functionality for implementations of the VersionControl interface.
@@ -30,9 +33,20 @@ public abstract class AbstractVersionControl implements VersionControl {
 
     public static final String VERSIONCONTROL = "versioncontrol";
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public void prepareSave(File file) {
+    public void prepareSave(Module module) {
         // Default is to do nothing before saving.
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void label(Module... modules) {
+        label(Arrays.asList(modules));
     }
 
     /**

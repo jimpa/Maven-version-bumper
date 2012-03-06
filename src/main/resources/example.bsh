@@ -1,36 +1,18 @@
 
 
-base = load("");
-base.version("1.2");
-base.label("BASE_1_2");
+base = load("", "1.2", "BASE_1_2");
 
-moduleA = load("moduleA");
+moduleA = load("moduleA", "9.1-SNAPSHOT", "MODULE_9_1");
 moduleA.parentVersion(base);
-moduleA.version("9.1-SNAPSHOT");
-moduleA.label("MODULEA_9_1");
 
-Module moduleB = load("moduleB");
+Module moduleB = load("moduleB", "3.1", "MODULEB_3_1");
 moduleB.parentVersion(base);
 moduleB.updateDependency(moduleA);
-moduleB.version("3.1");
-moduleB.label("MODULEB_3_1");
 
-Module moduleC = load("moduleC");
+Module moduleC = load("moduleC", "3.1", "MODULEC_3_1");
 moduleC.parentVersion(base);
 moduleC.updatePluginDependency(moduleB);
-moduleC.version("3.1");
-moduleC.label("MODULEC_3_1");
 
-Module moduleD = load("moduleD");
+Module moduleD = load("moduleD", "3.2", "MODULED_3_2");
 moduleD.parentVersion(base);
 moduleD.updatePluginDependency(moduleB);
-moduleD.version("3.2");
-moduleD.label("MODULED_3_2");
-
-print(base.gav());
-print(moduleA.gav());
-print(moduleB.gav());
-print(moduleC.gav());
-print(moduleD.gav());
-
-saveLoadedModules();

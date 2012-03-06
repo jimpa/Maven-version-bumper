@@ -42,6 +42,11 @@
             <version>2.0b4</version>
         </dependency>
         <dependency>
+            <groupId>net.sf.jopt-simple</groupId>
+            <artifactId>jopt-simple</artifactId>
+            <version>4.3</version>
+        </dependency>
+        <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <version>4.8.2</version>
@@ -78,6 +83,10 @@
                     </execution>
                 </executions>
             </plugin>
+            <!-- TODO sources -->
+            <!-- TODO javadoc -->
+            <!-- TODO site -->
+            <!-- TODO java 1.6 -->
         </plugins>
     </build>
 

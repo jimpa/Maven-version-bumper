@@ -1,29 +1,10 @@
-/*
- * Copyright (c) 2012 Jim Svensson <jimpa@tla.se>
- *
- * Permission to use, copy, modify, and distribute this software for any
- * purpose with or without fee is hereby granted, provided that the above
- * copyright notice and this permission notice appear in all copies.
- *
- * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
- * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
- * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
- * ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
- * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
- * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
- * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
- */
-
 package se.tla.mavenversionbumper.vcs;
 
 import java.io.File;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Properties;
-import java.util.Set;
+import java.util.*;
 
 import org.apache.commons.exec.CommandLine;
+import se.tla.mavenversionbumper.Module;
 
 /**
  * Implements VersionControl for the Clearcase versioning system.
@@ -34,7 +15,7 @@ public class Clearcase extends AbstractVersionControl {
 
     public static final String COMMANDPATH = "cleartool.path";
 
-    private final Set<String> checkedOut = new HashSet<String>();
+    private final Set<Module> checkedOut = new HashSet<Module>();
     private final String commandPath;
 
     public Clearcase(Properties controlProperties) {
@@ -49,14 +30,13 @@ public class Clearcase extends AbstractVersionControl {
     }
 
     /**
-     * Make sure that the file is checked out before the actual save.
-     * @param file pom.xml to save.
+     * {@inheritDoc}
      */
     @Override
-    public void prepareSave(File file) {
-        if (! checkedOut.contains(file.getName())) {
+    public void prepareSave(Module module) {
+        if (! checkedOut.contains(module)) {
             Map<String, Object> map = new HashMap<String, Object>();
-            map.put("file", file);
+            map.put("file", module.pomFile());
 
             CommandLine cmdLine = new CommandLine(commandPath);
             cmdLine.addArgument("checkout");
@@ -66,17 +46,40 @@ public class Clearcase extends AbstractVersionControl {
 
             execute(cmdLine, null);
 
-            checkedOut.add(file.getName());
+            checkedOut.add(module);
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public void commit(File file, String message) {
+    public void restore(Module module) {
         Map<String, Object> map = new HashMap<String, Object>();
-        map.put("file", file);
+        map.put("file", module.pomFile());
+
+        CommandLine cmdLine = new CommandLine(commandPath);
+        cmdLine.addArgument("uncheckout");
+        cmdLine.addArgument("-rm");
+        cmdLine.addArgument("${file}");
+        cmdLine.setSubstitutionMap(map);
+
+        execute(cmdLine, null);
+
+        checkedOut.remove(module);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void commit(Module module) {
+        Map<String, Object> map = new HashMap<String, Object>();
+        map.put("file", module.pomFile());
 
         CommandLine cmdLine = new CommandLine(commandPath);
         cmdLine.addArgument("checkin");
+        String message = module.commitMessage();
         if (message != null && message.length() > 0) {
         	cmdLine.addArgument("-c");
         	cmdLine.addArgument("${comment}");
@@ -89,20 +92,35 @@ public class Clearcase extends AbstractVersionControl {
 
         execute(cmdLine, null);
 
-        checkedOut.remove(file.getName());
+        checkedOut.remove(module);
     }
 
     /**
-     * This assumes that the label has to be created as well as applied.
-     * @param label
-     * @param targets
+     * {@inheritDoc}
      */
     @Override
-    public void label(String label, File ... targets) {
-        // Create label type
-        mklbtype(label);
+    public void label(Collection<Module> modules) {
+        Collection<Module> modulesToLabel = new LinkedList<Module>();
+        for (Module module : modules) {
+            String label = module.label();
+            if (label != null && label.length() > 0) {
+                modulesToLabel.add(module);
+            }
+        }
+
+        // Create label types
+        for (Module module : modulesToLabel) {
+            mklbtype(module.label());
+        }
+
         // Label
-        mklabel(label, targets);
+        for (Module module : modulesToLabel) {
+            if (module.labelOnlyPomXml()) {
+                mklabel(module.label(), false, module.pomFile(), module.pomFile().getParentFile());
+            } else {
+                mklabel(module.label(), true, module.pomFile().getParentFile());
+            }
+        }
     }
 
     private void mklbtype(String label) {
@@ -118,14 +136,16 @@ public class Clearcase extends AbstractVersionControl {
         execute(cmdLine, null);
     }
 
-    private void mklabel(String label, File ... targets) {
+    private void mklabel(String label, boolean recurse, File ... targets) {
         int index = 0;
         Map<String, Object> map = new HashMap<String, Object>();
         map.put("label", label);
 
         CommandLine cmdLine = new CommandLine(commandPath);
         cmdLine.addArgument("mklabel");
-        cmdLine.addArgument("-recurse");
+        if (recurse) {
+            cmdLine.addArgument("-recurse");
+        }
         cmdLine.addArgument("-replace");
         cmdLine.addArgument("-nc");
         cmdLine.addArgument("${label}");

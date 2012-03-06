@@ -48,7 +48,7 @@ class ModuleTestTemplate {
         File moduleBase = new File(base, sourceModuleName);
         File pomFile = new File(moduleBase, "pom.xml");
         String backup = FileUtils.readFileToString(pomFile);
-        Module subject = new Module("target/test-classes/sources", sourceModuleName, null);
+        Module subject = new Module("target/test-classes/sources", sourceModuleName);
         tinker.tink(subject);
         subject.save();
         String result = FileUtils.readFileToString(pomFile);

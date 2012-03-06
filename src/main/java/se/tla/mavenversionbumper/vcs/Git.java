@@ -17,6 +17,7 @@
 package se.tla.mavenversionbumper.vcs;
 
 import org.apache.commons.exec.CommandLine;
+import se.tla.mavenversionbumper.Module;
 
 import java.io.File;
 import java.util.*;
@@ -43,20 +44,39 @@ public class Git extends AbstractVersionControl {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public void commit(File file, String message) {
-        if (! file.exists()) {
-            throw new IllegalArgumentException("File to commit does not exist.");
-        }
-        if (message == null || message.isEmpty()) {
-            throw new IllegalArgumentException("The commmit message must contain something.");
-        }
-
-        File parentDir = file.getParentFile();
+    public void restore(Module module) {
+        File parentDir = module.pomFile().getParentFile();
 
         Map<String, Object> map = new HashMap<String, Object>();
-        map.put("file", file.getName());
-        map.put("message", message);
+        map.put("file", module.pomFile().getName());
+
+        CommandLine cmdLine = new CommandLine(commandPath);
+        cmdLine.addArgument("checkout");
+        cmdLine.addArgument("${file}");
+        cmdLine.setSubstitutionMap(map);
+
+        execute(cmdLine, parentDir);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void commit(Module module) {
+
+        if (! module.pomFile().exists()) {
+            throw new IllegalArgumentException("File to commit does not exist.");
+        }
+
+        File parentDir = module.pomFile().getParentFile();
+
+        Map<String, Object> map = new HashMap<String, Object>();
+        map.put("file", module.pomFile().getName());
+        map.put("message", module.commitMessage());
 
         CommandLine cmdLine = new CommandLine(commandPath);
         cmdLine.addArgument("commit");
@@ -68,21 +88,25 @@ public class Git extends AbstractVersionControl {
         execute(cmdLine, parentDir);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public void label(String label, File ... targets) {
-        Map<String, Object> map = new HashMap<String, Object>();
-        map.put("tag", label);
+    public void label(Collection<Module> modules) {
+        for (Module module : modules) {
+            String label = module.label();
+            if (label != null && label.length() > 0) {
+                Map<String, Object> map = new HashMap<String, Object>();
+                map.put("tag", label);
 
-        for (File target : targets) {
-            //map.put("file", target.getName());
+                CommandLine cmdLine = new CommandLine(commandPath);
+                cmdLine.addArgument("tag");
+                cmdLine.addArgument("-f");
+                cmdLine.addArgument("${tag}");
+                cmdLine.setSubstitutionMap(map);
 
-            CommandLine cmdLine = new CommandLine(commandPath);
-            cmdLine.addArgument("tag");
-            cmdLine.addArgument("-f");
-            cmdLine.addArgument("${tag}");
-            cmdLine.setSubstitutionMap(map);
-
-            execute(cmdLine, target.getParentFile());
+                execute(cmdLine, module.pomFile().getParentFile());
+            }
         }
     }
 }
