@@ -49,8 +49,8 @@ public class Module {
      *
      * @param baseDirName Filename of the base directory of the Maven module.
      * @param moduleName The symbolic name of the Maven module.
-     * @throws JDOMException
-     * @throws IOException
+     * @throws JDOMException Problem reading the pom.xml file.
+     * @throws IOException Problem reading the pom.xml file.
      */
     public Module(String baseDirName, String moduleName) throws JDOMException, IOException {
         this.moduleName = moduleName;
@@ -149,7 +149,7 @@ public class Module {
     /**
      * Update the parent version to that of this Module.
      *
-     * @param parent
+     * @param parent Use this modules version.
      */
     public void parentVersion(Module parent) {
         parentVersion(parent.version());
@@ -275,10 +275,9 @@ public class Module {
     /**
      * Apply this label to the Module when it is saved. Requires that a VersionControl was provided to work.
      *
-     * @param label
-     * @throws IOException
+     * @param label Label.
      */
-    public void label(String label) throws IOException {
+    public void label(String label) {
         this.label = label;
     }
 
@@ -290,10 +289,9 @@ public class Module {
      * Use this commit message if a commit to VersionControl is performed. If no custom message is provided,
      * a default message is used.
      *
-     * @param commitMessage
-     * @throws IOException
+     * @param commitMessage Custom message to use during a commit.
      */
-    public void commitMessage(String commitMessage) throws IOException {
+    public void commitMessage(String commitMessage) {
         this.commitMessage = commitMessage;
     }
 
@@ -352,6 +350,9 @@ public class Module {
         return pomFile;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String toString() {
         return moduleName;
