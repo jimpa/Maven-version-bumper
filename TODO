@@ -4,9 +4,14 @@ Thing coming in the near future
 Version bumper has been released as 1.0 and through that process a few short comings has been identified that needs
 to be fixed for it to be the tool that the author envisioned it to be.
 
-1 - Feature: scenarios needs to be restartable and the steps already completed needs to be skipped.
+1 - Feature: The possibility to get warnings about present SNAPSHOT versions in the affected pom-files after update.
+  If the aim of an update is to bump all modules to non-SNAPSHOT versions, it is easy to miss one and that will
+  lead to that the release contains non fixed versions. The possibility to ask for warnings of this during a
+  dry run would be useful.
+
+2 - Feature: scenarios needs to be restartable and the steps already completed needs to be skipped.
   If during a run of a scenario somethings breaks, it should be easy to just resume the scenario from where it broke.
 
-2 - More version control systems needs to be implemented.
+3 - More version control systems needs to be implemented.
   * Subversion
   * CVS (?)
