@@ -18,8 +18,10 @@ package se.tla.mavenversionbumper;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.LinkedList;
 import java.util.List;
 
+import com.sun.tools.javac.resources.version;
 import org.apache.commons.io.FileUtils;
 import org.jdom.Document;
 import org.jdom.Element;
@@ -34,6 +36,7 @@ import org.jdom.output.XMLOutputter;
  * It contains methods to easily view and manipulate dependency information.
  */
 public class Module {
+    public static final String SNAPSHOTPATTERN = "-SNAPSHOT";
     final private Document document;
     final private File pomFile;
     final private Element root;
@@ -260,7 +263,7 @@ public class Module {
      * Save this module back to its original pom.xml file.
      *
      * If a VersionControl was provided while creating this Module, the pom.xml is first
-     * commited and then, optionally, labeled.
+     * committed and then, optionally, labeled.
      *
      * @throws IOException in case of IO-related problems.
      */
@@ -303,16 +306,7 @@ public class Module {
     }
 
     private Element findDependencyElement(Module moduleToFind, String ... path) {
-        Element cur = root;
-
-        for (String pathPart : path) {
-            cur = cur.getChild(pathPart, nameSpace);
-            if (cur == null) {
-                return null;
-            }
-        }
-
-        for (Element dep : (List<Element>) cur.getChildren()) {
+        for (Element dep : getDependencyElements(path)) {
             String groupId = dep.getChildText("groupId", nameSpace);
             String artifactId = dep.getChildText("artifactId", nameSpace);
 
@@ -322,6 +316,83 @@ public class Module {
         }
 
         return null;
+    }
+
+    private List<Element> getDependencyElements(String ... path) {
+        Element cur = root;
+
+        for (String pathPart : path) {
+            cur = cur.getChild(pathPart, nameSpace);
+            if (cur == null) {
+                return new LinkedList<Element>();
+            }
+        }
+
+        return (List<Element>) cur.getChildren();
+    }
+
+    public List<String> findSnapshots() {
+        List<String> result = new LinkedList<String>();
+
+        // Own version
+        if (version().endsWith(SNAPSHOTPATTERN)) {
+            result.add("Module version");
+        }
+
+        // Parent Version
+        String parentVersion = parentVersion();
+        if (parentVersion != null && parentVersion.endsWith(SNAPSHOTPATTERN)) {
+            result.add("Parent version " + parentVersion);
+        }
+
+        // Properties
+        Element properties = root.getChild("properties", nameSpace);
+        if (properties != null) {
+            for (Element child : (List<Element>) properties.getChildren()) {
+                String text = child.getText();
+                if (text != null && text.endsWith(SNAPSHOTPATTERN)) {
+                    result.add("Property " + child.getName() + ":" + text);
+                }
+            }
+        }
+
+        // Dependencies
+        for (Element dep : getDependencyElements("dependencies")) {
+            String version = extractText(dep, "version");
+            if (version != null && version.endsWith(SNAPSHOTPATTERN)) {
+                result.add("Dependency " + extractText(dep, "groupId") + ":" + extractText(dep, "artifactId") + ":" + version);
+            }
+        }
+
+        // Dependency management
+        for (Element dep : getDependencyElements("dependencyManagement", "dependencies")) {
+            String version = extractText(dep, "version");
+            if (version != null && version.endsWith(SNAPSHOTPATTERN)) {
+                result.add("Dependency management " + extractText(dep, "groupId") + ":" + extractText(dep, "artifactId") + ":" + version);
+            }
+        }
+
+        // Plugins
+        for (Element dep : getDependencyElements("build", "plugins")) {
+            String version = extractText(dep, "version");
+            if (version != null && version.endsWith(SNAPSHOTPATTERN)) {
+                result.add("Plugin " + extractText(dep, "groupId") + ":" + extractText(dep, "artifactId") + ":" + version);
+            }
+        }
+
+        // Plugin management
+        for (Element dep : getDependencyElements("build", "pluginManagement", "plugins")) {
+            String version = extractText(dep, "version");
+            if (version != null && version.endsWith(SNAPSHOTPATTERN)) {
+                result.add("Plugin management " + extractText(dep, "groupId") + ":" + extractText(dep, "artifactId") + ":" + version);
+            }
+        }
+
+        return result;
+    }
+
+    private String extractText(Element dep, String elementName) {
+        return dep.getChildText(elementName, nameSpace);
     }
 
     /**

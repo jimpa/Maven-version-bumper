@@ -56,6 +56,7 @@ public class Main {
     enum Option {
         DRYRUN("Dry run. Don't modify anything, only validate configuration.", "d", "dry-run"),
         REVERT("Revert any uncommited changes.", "r", "revert"),
+        WARNOFSNAPSHOTS("Searches for any SNAPSHOT dependencies and warns about them. Works great with --dry-run.", "w", "warn-snapshots"),
         HELP("Show help.", "h", "?", "help");
 
         private String helpText;
@@ -89,6 +90,7 @@ public class Main {
             {
                 acceptsAll(Option.DRYRUN.getAliases(), Option.DRYRUN.getHelpText());
                 acceptsAll(Option.REVERT.getAliases(), Option.REVERT.getHelpText());
+                acceptsAll(Option.WARNOFSNAPSHOTS.getAliases(), Option.WARNOFSNAPSHOTS.getHelpText());
                 acceptsAll(Option.HELP.getAliases(), Option.HELP.getHelpText());
             }
         };
@@ -119,7 +121,7 @@ public class Main {
         List<String> arguments = options.nonOptionArguments();
 
         if (arguments.size() < 2 || arguments.size() > 3) {
-            System.err.println("Usage: [-d | --dry-run] [-r | --revert] [-h | --help] <base directory> <scenarioFile> [<VC properties file>]");
+            System.err.println("Usage: [-d | --dry-run] [-r | --revert] [-w | --warn-snapshot] [-h | --help] <base directory> <scenarioFile> [<VC properties file>]");
             System.exit(1);
         }
 
@@ -178,6 +180,18 @@ public class Main {
             i.eval("loadReadOnly(String moduleName) { return Main.load(moduleName, null, null, false); }");
             i.eval("loadReadOnly(String moduleName, String version) { return Main.load(moduleName, version, null, false); }");
             i.eval(scenario);
+
+            if (Option.WARNOFSNAPSHOTS.presentIn(options)) {
+                for (Module module : modulesLoadedForUpdate) {
+                    List<String> result = module.findSnapshots();
+                    if (result.size() > 0) {
+                        System.out.println("SNAPSHOTS found in module " + module.gav());
+                        for (String s : result) {
+                            System.out.println("  " + s);
+                        }
+                    }
+                }
+            }
 
             if (type.equals(TYPE.NORMAL)) {
                 if (versionControl != null) {

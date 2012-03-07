@@ -19,6 +19,8 @@ package se.tla.mavenversionbumper;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.util.List;
+
 /**
  * Unit tests for the Module class.
  */
@@ -172,5 +174,30 @@ public class ModuleTest {
         } catch (IllegalArgumentException e) {
             // Expected
         }
+    }
+
+    @Test
+    public void testFindAllSnapshots() throws Exception {
+        final Module subject = new Module("target/test-classes/sources", "withAllSnapshots");
+
+        List<String> result = subject.findSnapshots();
+
+        Assert.assertEquals(7, result.size());
+        Assert.assertEquals("Module version", result.get(0));
+        Assert.assertEquals("Parent version 2-SNAPSHOT", result.get(1));
+        Assert.assertEquals("Property testVersion:3-SNAPSHOT", result.get(2));
+        Assert.assertEquals("Dependency foo:dependency:4-SNAPSHOT", result.get(3));
+        Assert.assertEquals("Dependency management foo:dependencymanagement:5-SNAPSHOT", result.get(4));
+        Assert.assertEquals("Plugin foo:plugin:6-SNAPSHOT", result.get(5));
+        Assert.assertEquals("Plugin management foo:pluginmanagement:7-SNAPSHOT", result.get(6));
+    }
+
+    @Test
+    public void testFindNoSnapshots() throws Exception {
+        final Module subject = new Module("target/test-classes/sources", "withNoSnapshots");
+
+        List<String> result = subject.findSnapshots();
+
+        Assert.assertEquals(0, result.size());
     }
 }
