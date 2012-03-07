@@ -9,9 +9,12 @@ to be fixed for it to be the tool that the author envisioned it to be.
   lead to that the release contains non fixed versions. The possibility to ask for warnings of this during a
   dry run would be useful.
 
-2 - Feature: scenarios needs to be restartable and the steps already completed needs to be skipped.
+2 - Feature: External, read-only, modules to use in updates.
+  These modules doesn't need a full set of information, only the GAV-coordinates.
+
+3 - Feature: scenarios needs to be restartable and the steps already completed needs to be skipped.
   If during a run of a scenario somethings breaks, it should be easy to just resume the scenario from where it broke.
 
-3 - More version control systems needs to be implemented.
+4 - More version control systems needs to be implemented.
   * Subversion
   * CVS (?)
