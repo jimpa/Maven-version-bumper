@@ -70,6 +70,18 @@ public class Module {
         originalVersion = version();
     }
 
+    /**
+     * Constructor used only by the sub class ReadonlyModule to satisfy the compiler. Should never be used.
+     */
+    protected Module() {
+        document = null;
+        pomFile = null;
+        root = null;
+        nameSpace = null;
+        moduleName = null;
+        originalVersion = null;
+    }
+
     private File openDir(File base, String name) {
         File dir;
         if (base != null) {

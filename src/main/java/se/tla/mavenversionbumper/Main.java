@@ -174,11 +174,11 @@ public class Main {
             i.eval("importCommands(\"se.tla.mavenversionbumper.commands\")");
             i.eval("import se.tla.mavenversionbumper.Main");
             i.eval("import se.tla.mavenversionbumper.Module");
+            i.eval("import se.tla.mavenversionbumper.ReadonlyModule");
             i.eval("baseDir = \"" + baseDir + "\"");
-            i.eval("load(String moduleName) { return Main.load(moduleName, null, null, true); }");
-            i.eval("load(String moduleName, String newVersion, String label) { return Main.load(moduleName, newVersion, label, true); }");
-            i.eval("loadReadOnly(String moduleName) { return Main.load(moduleName, null, null, false); }");
-            i.eval("loadReadOnly(String moduleName, String version) { return Main.load(moduleName, version, null, false); }");
+            i.eval("load(String moduleName, String newVersion) { return Main.load(moduleName, newVersion, null); }");
+            i.eval("load(String moduleName, String newVersion, String label) { return Main.load(moduleName, newVersion, label); }");
+            i.eval("loadReadOnly(String groupId, String artifactId, String version) { return new ReadonlyModule(groupId, artifactId, version); }");
             i.eval(scenario);
 
             if (Option.WARNOFSNAPSHOTS.presentIn(options)) {
@@ -237,12 +237,11 @@ public class Main {
      * @param moduleDirectoryName
      * @param newVersion
      * @param label
-     * @param openForUpdate
      * @return Newly created Module.
      * @throws JDOMException
      * @throws IOException
      */
-    public static Module load(String moduleDirectoryName, String newVersion, String label, boolean openForUpdate) throws JDOMException, IOException {
+    public static Module load(String moduleDirectoryName, String newVersion, String label) throws JDOMException, IOException {
         Module m = new Module(baseDir, moduleDirectoryName);
 
         if (newVersion != null) {
@@ -257,9 +256,7 @@ public class Main {
             System.out.println("NEW: " + m.gav() + (label != null ? " (" + label + ")" : ""));
         }
 
-        if (openForUpdate) {
-            modulesLoadedForUpdate.add(m);
-        }
+        modulesLoadedForUpdate.add(m);
 
         return m;
     }
