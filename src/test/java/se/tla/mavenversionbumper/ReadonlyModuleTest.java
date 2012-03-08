@@ -47,9 +47,8 @@ public class ReadonlyModuleTest {
         Assert.assertEquals(GROUP_ID + ":" + ARTIFACT_ID + ":" + VERSION, subject.toString());
     }
 
-    // TODO Fix this test. Almost works.
-    //@Test
-    public void testUnsupportedMethods() {
+    @Test
+    public void testUnsupportedMethods() throws NoSuchMethodException, InvocationTargetException, IllegalAccessException, InstantiationException {
 
         for (Method method : subject.getClass().getMethods()) {
             String name = method.getName();
@@ -57,6 +56,12 @@ public class ReadonlyModuleTest {
                 "artifactId".equals(name) ||
                 "version".equals(name) ||
                 "gav".equals(name) ||
+                "wait".equals(name) ||
+                "equals".equals(name) ||
+                "hashCode".equals(name) ||
+                "getClass".equals(name) ||
+                "notify".equals(name) ||
+                "notifyAll".equals(name) ||
                 "toString".equals(name)) {
                 continue;
             }
@@ -64,10 +69,14 @@ public class ReadonlyModuleTest {
             Class[] parameterTypes = method.getParameterTypes();
             Object[] parameters = new Object[parameterTypes.length];
             for (int i = 0; i < parameters.length; i++) {
-                parameters[i] = null;
+                if (parameterTypes[i].isPrimitive()) {
+                    parameters[i] = new Boolean(true);
+                            //parameterTypes[i].getConstructor(String.class).newInstance(null);
+                } else {
+                    parameters[i] = null;
+                }
             }
 
-            System.out.println("name : " + method.getName());
             try {
                 if (parameters.length > 0) {
                     method.invoke(subject, parameters);
