@@ -22,7 +22,7 @@ package se.tla.mavenversionbumper;
 interface ModuleTinker {
     /**
      * Perform tinkering on the subject.
-     * @param subject
+     * @param subject Module to manipulate.
      */
     void tink(Module subject);
 }
