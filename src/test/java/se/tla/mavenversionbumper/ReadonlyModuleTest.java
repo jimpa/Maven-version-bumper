@@ -48,7 +48,8 @@ public class ReadonlyModuleTest {
     }
 
     @Test
-    public void testUnsupportedMethods() throws NoSuchMethodException, InvocationTargetException, IllegalAccessException, InstantiationException {
+    public void testUnsupportedMethods() throws NoSuchMethodException, InvocationTargetException,
+            IllegalAccessException, InstantiationException {
 
         for (Method method : subject.getClass().getMethods()) {
             String name = method.getName();
@@ -70,8 +71,7 @@ public class ReadonlyModuleTest {
             Object[] parameters = new Object[parameterTypes.length];
             for (int i = 0; i < parameters.length; i++) {
                 if (parameterTypes[i].isPrimitive()) {
-                    parameters[i] = new Boolean(true);
-                            //parameterTypes[i].getConstructor(String.class).newInstance(null);
+                    parameters[i] = true; // No, this isn't a perfect solution. But it works for now and when it breaks, it breaks early.
                 } else {
                     parameters[i] = null;
                 }
