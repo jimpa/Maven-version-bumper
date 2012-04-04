@@ -32,6 +32,7 @@ import se.tla.mavenversionbumper.Module;
 public abstract class AbstractVersionControl implements VersionControl {
 
     public static final String VERSIONCONTROL = "versioncontrol";
+    private static final int DEFAULTTIMEOUT = 60000;
 
     /**
      * {@inheritDoc}
@@ -50,13 +51,25 @@ public abstract class AbstractVersionControl implements VersionControl {
     }
 
     /**
-     * Execute this command line, optionally in this working directory.
-     * @param cmdLine
-     * @param workDir
+     * Execute this command line, optionally in this working directory. Timeout of command is set to 60 seconds
+     * @param cmdLine Command line to execute.
+     * @param workDir Working directory to set before execution, or null if process default working directory should be used.
      */
     protected void execute(CommandLine cmdLine, File workDir) {
+        execute(cmdLine, workDir, DEFAULTTIMEOUT);
+    }
+
+    /**
+     * Execute this command line, optionally in this working directory.
+     * @param cmdLine Command line to execute.
+     * @param workDir Working directory to set before execution, or null if process default working directory should be used.
+     * @param timeout Time out in ms. If -1, don't set any time out.
+     */
+    protected void execute(CommandLine cmdLine, File workDir, int timeout) {
         DefaultExecutor exec = new DefaultExecutor();
-        exec.setWatchdog(new ExecuteWatchdog(60000));
+        if (timeout != -1) {
+            exec.setWatchdog(new ExecuteWatchdog(timeout));
+        }
         if (workDir != null) {
             exec.setWorkingDirectory(workDir);
         }
