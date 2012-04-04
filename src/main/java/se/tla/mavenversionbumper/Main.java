@@ -234,12 +234,12 @@ public class Main {
     /**
      * Create a Module located by this filename that is a directory relative to the baseDir.
      *
-     * @param moduleDirectoryName
-     * @param newVersion
-     * @param label
+     * @param moduleDirectoryName Name of base directory for the module.
+     * @param newVersion New version to set directly, of null if no version should be set.
+     * @param label New label to set directly, or null if no labeling should be performed.
      * @return Newly created Module.
-     * @throws JDOMException
-     * @throws IOException
+     * @throws JDOMException If the modules pom.xml couldn't be parsed.
+     * @throws IOException if the modules pom.xml couldn't be read.
      */
     public static Module load(String moduleDirectoryName, String newVersion, String label) throws JDOMException, IOException {
         Module m = new Module(baseDir, moduleDirectoryName);
