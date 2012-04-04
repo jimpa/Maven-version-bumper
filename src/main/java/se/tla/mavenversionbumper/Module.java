@@ -21,7 +21,6 @@ import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 
-import com.sun.tools.javac.resources.version;
 import org.apache.commons.io.FileUtils;
 import org.jdom.Document;
 import org.jdom.Element;
