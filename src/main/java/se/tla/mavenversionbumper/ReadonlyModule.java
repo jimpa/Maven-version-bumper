@@ -23,7 +23,7 @@ import java.io.IOException;
 import java.util.List;
 
 /**
- * Extention of the Module class that only supplies the GAV coordinates. All other methods
+ * Extension of the Module class that only supplies the GAV coordinates. All other methods
  * fails. Used to express Maven modules that we have no control over, but need to handle
  * dependency towards.
  */
