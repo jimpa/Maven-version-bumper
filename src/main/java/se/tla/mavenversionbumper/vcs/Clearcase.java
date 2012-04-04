@@ -14,9 +14,12 @@ import se.tla.mavenversionbumper.Module;
 public class Clearcase extends AbstractVersionControl {
 
     public static final String COMMANDPATH = "cleartool.path";
+    public static final String LABELTIMEOUT = "cleartool.labeltimeout";
+    private static final String LABELDEFAULTTIMEOUT = "900000"; // 15 minutes.
 
     private final Set<Module> checkedOut = new HashSet<Module>();
     private final String commandPath;
+    private final int labelTimeout;
 
     public Clearcase(Properties controlProperties) {
         this.commandPath = controlProperties.getProperty(COMMANDPATH);
@@ -26,6 +29,13 @@ public class Clearcase extends AbstractVersionControl {
 
         if (! new File(commandPath).exists()) {
             throw new IllegalArgumentException(COMMANDPATH + " " + commandPath + " doesn't exist");
+        }
+        String timeoutProperty = controlProperties.getProperty(LABELTIMEOUT, LABELDEFAULTTIMEOUT);
+
+        try {
+            this.labelTimeout = Integer.parseInt(timeoutProperty);
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException("The property " + LABELTIMEOUT + " must be an integer");
         }
     }
 
@@ -159,6 +169,6 @@ public class Clearcase extends AbstractVersionControl {
 
         cmdLine.setSubstitutionMap(map);
 
-        execute(cmdLine, null);
+        execute(cmdLine, null, labelTimeout);
     }
 }
