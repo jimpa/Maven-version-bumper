@@ -176,6 +176,7 @@ public class Main {
             i.eval("import se.tla.mavenversionbumper.Module");
             i.eval("import se.tla.mavenversionbumper.ReadonlyModule");
             i.eval("baseDir = \"" + baseDir + "\"");
+            i.eval("load(String moduleName) { return Main.load(moduleName, null, null); }");
             i.eval("load(String moduleName, String newVersion) { return Main.load(moduleName, newVersion, null); }");
             i.eval("load(String moduleName, String newVersion, String label) { return Main.load(moduleName, newVersion, label); }");
             i.eval("loadReadOnly(String groupId, String artifactId, String version) { return new ReadonlyModule(groupId, artifactId, version); }");
