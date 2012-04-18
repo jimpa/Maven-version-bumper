@@ -18,7 +18,7 @@
 Maven Version Bumper
  --------
  --------
-2012-03-07
+2012-04-18
  --------
 
 Maven Version Bumper
@@ -26,12 +26,12 @@ Maven Version Bumper
 * Rationale
 
   The need for this tool comes from a desire to have precise control when bumping versions in large multi-module
-  projects where the modules individual version cycles behaves differently from each other.
+  projects where the modules individual version cycles aren't always synchronized.
 
 ** The current problem
 
-  There are a number of different Maven plugins (releases, versions) that does a fair job tackling this problem, but
-  they have a number of shortcomings:
+  There are a number of different Maven plugins (for example releases and versions) that does a fair job
+  tackling this problem, but they have a number of shortcomings:
 
     * They employ a rather sweeping attitude that everything should be updated everywhere always.
 
@@ -45,9 +45,9 @@ Maven Version Bumper
 
 ** Dependency Version Hell
 
-  Any fairly large scale project that uses Maven soon fins the need to organize its code a number of different modules.
-  This need comes from the fact different parts of the project needs to be released at different times but still have
-  a common code base whose versions needs to be tightly controlled.
+  Any fairly large scale project that uses Maven soon finds the need to organize its code in a number of different
+  modules. This need comes from the fact different parts of the project needs to be released at different times but
+  still have a common code base whose versions needs to be tightly controlled.
 
   In the early stages of development all the modules gets their versions bumped at the same time and all the
   module dependencies can be bumped as well. Life is easy.
@@ -61,15 +61,14 @@ Maven Version Bumper
   All this boils down to the stage when the initial development project is done and the mature code moves into the
   a maintenance phase with a very strong need for tight control of what gets included in each release.
 
-  If you have keept a good mindfulness of how you administrate your dependencies from early on, life will be quite
-  easy, but if you think that it will probably fix itself over time chanses are goot that you can now welcome
-  "Dependency Version Hell".
+  If you have kept a good mindfulness of how you administrate your dependencies from early on, life can be quite
+  easy, but if you think that it will probably fix itself over time chances are good that you can now welcome
+  "Dependency Version Hell" into your life.
 
 ** A suggestion to an alternate solution
 
-  The exiting plugins release and versions have the same goal here, to automate repetitive work in keeping the
-  dependencies under control. It is not the goal that the author objects to, but rather the method of getting
-  there.
+  The existing plugins release and versions have the same goal here, to automate the repetitive work of keeping the
+  dependencies under control. It is not the goal that the author objects to, but rather the method of getting there.
 
   Maven Version Bumper is an experiment to try out a different approach to solve the same problem. The author
   doesn't claim that this is the best solution, but argues that you can't know this until you have tried.
@@ -85,13 +84,15 @@ Maven Version Bumper
 
     * integrates with your Version Control System to integrate commit messages and tagging/labeling.
 
-    * can Version Control System to revert changes from test-runs that havn't been commited yet.
+    * can use the Version Control System to prepare for test builds and then revert the changes after the test.
+
+    * can be used to find any lingering SNAPSHOT dependencies that could possibly indicate forgotten modules.
 
 
-* Scope of the package
+* Scope of the tool
 
   This tool is a building block in the larger release process in that it tries to create a clear, dense and simple
-  syntax, DSL if you like, for the task of defining what versions that should get updated.
+  syntax, a DSL if you like, for the task of defining what versions that should get updated.
 
   It also has a simple integration towards version control so that you can automate the committing of pom.xml-files
   and tagging of the modules at the same time.
@@ -99,8 +100,4 @@ Maven Version Bumper
   Besides this the tools tries to makes as few dependencies of its own on its environment. If you need integration with
   an Issue Management System, you have to do it outside this tool. Connection to you build server? Same thing.
 
-  Do one or a few things, and do them well.
-
-* Releases
-
-  The latest version v1.0.
+  Do a few things, and do them well.
