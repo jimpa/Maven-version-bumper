@@ -1,3 +1,6 @@
 versioncontrol=clearcase
 #
 cleartool.path=/bin/echo
+
+# Default timeout for the label command is 15 minutes.
+#cleartool.labeltimeout=900000
