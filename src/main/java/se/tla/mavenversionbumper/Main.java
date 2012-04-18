@@ -90,8 +90,8 @@ public class Main {
         OptionParser parser = new OptionParser() {
             {
                 acceptsAll(Option.DRYRUN.getAliases(), Option.DRYRUN.getHelpText());
-                acceptsAll(Option.REVERT.getAliases(), Option.REVERT.getHelpText());
                 acceptsAll(Option.PREPARETEST.getAliases(), Option.PREPARETEST.getHelpText());
+                acceptsAll(Option.REVERT.getAliases(), Option.REVERT.getHelpText());
                 acceptsAll(Option.WARNOFSNAPSHOTS.getAliases(), Option.WARNOFSNAPSHOTS.getHelpText());
                 acceptsAll(Option.HELP.getAliases(), Option.HELP.getHelpText());
             }
@@ -123,7 +123,7 @@ public class Main {
         List<String> arguments = options.nonOptionArguments();
 
         if (arguments.size() < 2 || arguments.size() > 3) {
-            System.err.println("Usage: [-d | --dry-run] [-r | --revert] [-p | --prepare-test-build] [-w | --warn-snapshot] [-h | --help] <base directory> <scenarioFile> [<VC properties file>]");
+            System.err.println("Usage: [-d | --dry-run] [-p | --prepare-test-build] [-r | --revert] [-w | --warn-snapshot] [-h | --help] <base directory> <scenarioFile> [<VC properties file>]");
             System.exit(1);
         }
 
