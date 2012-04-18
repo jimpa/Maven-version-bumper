@@ -32,7 +32,7 @@ public class ReadonlyModule extends Module {
     private final String artifactId;
     private final String version;
 
-    public ReadonlyModule(String baseDirName, String moduleName) throws JDOMException, IOException {
+    public ReadonlyModule(@SuppressWarnings("UnusedParameters") String baseDirName, @SuppressWarnings("UnusedParameters") String moduleName) {
         throw new UnsupportedOperationException("No supported in readonly modules");
     }
 

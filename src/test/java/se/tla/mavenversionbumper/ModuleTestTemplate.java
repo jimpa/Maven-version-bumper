@@ -38,10 +38,10 @@ class ModuleTestTemplate {
      *     <li>Restore the original input file</li>
      * </ul>
      *
-     * @param sourceModuleName
-     * @param resultReference
-     * @param tinker
-     * @throws Exception
+     * @param sourceModuleName Name of source to load.
+     * @param resultReference Name of the expected reference.
+     * @param tinker Tinker to use.
+     * @throws Exception In case of problems.
      */
     public static void template(String sourceModuleName, String resultReference, ModuleTinker tinker) throws Exception {
         File base = new File("target/test-classes/sources");

@@ -29,6 +29,7 @@ import se.tla.mavenversionbumper.Module;
 /**
  * Common functionality for implementations of the VersionControl interface.
  */
+@SuppressWarnings("ALL")
 public abstract class AbstractVersionControl implements VersionControl {
 
     public static final String VERSIONCONTROL = "versioncontrol";

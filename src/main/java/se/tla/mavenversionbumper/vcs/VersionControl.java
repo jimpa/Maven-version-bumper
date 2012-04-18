@@ -51,6 +51,7 @@ public interface VersionControl {
      * Apply any labels that has been registered in these modules.
      * @param modules Modules.
      */
+    @SuppressWarnings("UnusedDeclaration")
     void label(Module ... modules);
 
     /**

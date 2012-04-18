@@ -28,9 +28,9 @@ import java.lang.reflect.Method;
  */
 public class ReadonlyModuleTest {
 
-    public static final String GROUP_ID = "groupId";
-    public static final String ARTIFACT_ID = "artifactId";
-    public static final String VERSION = "1.0";
+    private static final String GROUP_ID = "groupId";
+    private static final String ARTIFACT_ID = "artifactId";
+    private static final String VERSION = "1.0";
     private ReadonlyModule subject;
 
     @Before

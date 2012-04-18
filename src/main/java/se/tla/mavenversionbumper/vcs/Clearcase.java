@@ -13,8 +13,8 @@ import se.tla.mavenversionbumper.Module;
  */
 public class Clearcase extends AbstractVersionControl {
 
-    public static final String COMMANDPATH = "cleartool.path";
-    public static final String LABELTIMEOUT = "cleartool.labeltimeout";
+    private static final String COMMANDPATH = "cleartool.path";
+    private static final String LABELTIMEOUT = "cleartool.labeltimeout";
     private static final String LABELDEFAULTTIMEOUT = "900000"; // 15 minutes.
 
     private final Set<Module> checkedOut = new HashSet<Module>();

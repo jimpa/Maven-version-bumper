@@ -35,7 +35,7 @@ import org.jdom.output.XMLOutputter;
  * It contains methods to easily view and manipulate dependency information.
  */
 public class Module {
-    public static final String SNAPSHOTPATTERN = "-SNAPSHOT";
+    private static final String SNAPSHOTPATTERN = "-SNAPSHOT";
     final private Document document;
     final private File pomFile;
     final private Element root;
@@ -108,7 +108,7 @@ public class Module {
     /**
      * @param groupId New GroupId.
      */
-    public void groupId(String groupId) {
+    public void groupId(@SuppressWarnings("SameParameterValue") String groupId) {
         root.getChild("groupId", nameSpace).setText(groupId);
     }
 
@@ -119,7 +119,7 @@ public class Module {
     /**
      * @param artifactId New ArtifactId.
      */
-    public void artifactId(String artifactId) {
+    public void artifactId(@SuppressWarnings("SameParameterValue") String artifactId) {
         root.getChild("artifactId", nameSpace).setText(artifactId);
     }
 

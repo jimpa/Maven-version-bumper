@@ -29,7 +29,7 @@ import java.util.*;
  */
 public class Git extends AbstractVersionControl {
 
-    public static final String COMMANDPATH = "git.path";
+    private static final String COMMANDPATH = "git.path";
 
     private final String commandPath;
 

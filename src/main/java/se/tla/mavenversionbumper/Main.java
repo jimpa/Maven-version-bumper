@@ -40,11 +40,11 @@ import bsh.Interpreter;
  */
 public class Main {
 
-    public static final List<Module> modulesLoadedForUpdate = new LinkedList<Module>();
+    private static final List<Module> modulesLoadedForUpdate = new LinkedList<Module>();
 
     private static String baseDir;
     private static VersionControl versionControl;
-    private static Map<String, Class<? extends VersionControl>> versionControllers;
+    private static final Map<String, Class<? extends VersionControl>> versionControllers;
 
     static {
         versionControllers = new HashMap<String, Class<? extends VersionControl>>();
@@ -59,8 +59,8 @@ public class Main {
         WARNOFSNAPSHOTS("Searches for any SNAPSHOT dependencies and warns about them. Works great with --dry-run.", "w", "warn-snapshots"),
         HELP("Show help.", "h", "?", "help");
 
-        private String helpText;
-        private String[] aliases;
+        private final String helpText;
+        private final String[] aliases;
 
         Option(String helpText, String... aliases) {
             this.helpText = helpText;
