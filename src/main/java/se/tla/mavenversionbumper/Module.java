@@ -184,6 +184,8 @@ public class Module {
     /**
      * Find this module in either the modules dependency management list or in the dependency list.
      *
+     * If the found dependency refers to a property for the version, an updateProperty is tried on that property name.
+     *
      * @param moduleToUpdate Module to find and update version for.
      * @throws IllegalArgumentException If the moduleToUpdate can't be found in either list.
      */
@@ -207,9 +209,12 @@ public class Module {
             ". Probably defined elsewhere in a dependencyManagement.");
         }
 
-        if (version.getText().startsWith("${") && version.getText().endsWith("}")) {
-            throw new IllegalArgumentException("In " + gav() + ", the dependency to " + moduleToUpdate.gav() +
-                    "'s version is controlled by a property. Use updateProperty instead.");
+        String versionText = version.getText();
+        if (versionText.startsWith("${") && versionText.endsWith("}")) {
+            String propertyName = versionText.substring(2).substring(0, versionText.length() - 3);
+
+            updateProperty(propertyName, moduleToUpdate.version());
+            return;
         }
 
         version.setText(moduleToUpdate.version());

@@ -177,6 +177,33 @@ public class ModuleTest {
     }
 
     @Test
+    public void testUpdatePropertyAsProperty() throws Exception {
+        final Module depmod = new Module("target/test-classes", "simple");
+        ModuleTestTemplate.template("dependencyAsProperty", "dependencyAsProperty.xml", new ModuleTinker() {
+            @Override
+            public void tink(Module subject) {
+                subject.updateDependency(depmod);
+            }
+        });
+    }
+
+    @Test
+    public void testUpdatePropertyAsMissingProperty() throws Exception {
+        try {
+            final Module depmod = new Module("target/test-classes", "simple");
+            ModuleTestTemplate.template("dependencyAsMissingProperty", "dependencyAsProperty.xml", new ModuleTinker() {
+                @Override
+                public void tink(Module subject) {
+                    subject.updateDependency(depmod);
+                }
+            });
+            Assert.fail();
+        } catch (IllegalArgumentException e) {
+            // Expected
+        }
+    }
+
+    @Test
     public void testFindAllSnapshots() throws Exception {
         final Module subject = new Module("target/test-classes/sources", "withAllSnapshots");
 
