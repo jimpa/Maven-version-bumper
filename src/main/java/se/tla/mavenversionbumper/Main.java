@@ -56,6 +56,7 @@ public class Main {
     enum Option {
         DRYRUN("Dry run. Don't modify anything, only validate configuration.", "d", "dry-run"),
         REVERT("Revert any uncommited changes.", "r", "revert"),
+        PREPARETEST("Prepare module(s) for a test build.", "p", "prepare-test-build"),
         WARNOFSNAPSHOTS("Searches for any SNAPSHOT dependencies and warns about them. Works great with --dry-run.", "w", "warn-snapshots"),
         HELP("Show help.", "h", "?", "help");
 
@@ -81,7 +82,7 @@ public class Main {
     }
 
     enum TYPE {
-        NORMAL, DRYRUN, REVERT
+        NORMAL, DRYRUN, REVERT, PREPARETEST
     }
 
     public static void main(String args[]) {
@@ -90,6 +91,7 @@ public class Main {
             {
                 acceptsAll(Option.DRYRUN.getAliases(), Option.DRYRUN.getHelpText());
                 acceptsAll(Option.REVERT.getAliases(), Option.REVERT.getHelpText());
+                acceptsAll(Option.PREPARETEST.getAliases(), Option.PREPARETEST.getHelpText());
                 acceptsAll(Option.WARNOFSNAPSHOTS.getAliases(), Option.WARNOFSNAPSHOTS.getHelpText());
                 acceptsAll(Option.HELP.getAliases(), Option.HELP.getHelpText());
             }
@@ -121,7 +123,7 @@ public class Main {
         List<String> arguments = options.nonOptionArguments();
 
         if (arguments.size() < 2 || arguments.size() > 3) {
-            System.err.println("Usage: [-d | --dry-run] [-r | --revert] [-w | --warn-snapshot] [-h | --help] <base directory> <scenarioFile> [<VC properties file>]");
+            System.err.println("Usage: [-d | --dry-run] [-r | --revert] [-p | --prepare-test-build] [-w | --warn-snapshot] [-h | --help] <base directory> <scenarioFile> [<VC properties file>]");
             System.exit(1);
         }
 
@@ -167,6 +169,9 @@ public class Main {
         if (Option.REVERT.presentIn(options)) {
             type = TYPE.REVERT;
         }
+        if (Option.PREPARETEST.presentIn(options)) {
+            type = TYPE.PREPARETEST;
+        }
 
         try {
             String scenario = FileUtils.readFileToString(scenarioFile);
@@ -194,7 +199,7 @@ public class Main {
                 }
             }
 
-            if (type.equals(TYPE.NORMAL)) {
+            if (type.equals(TYPE.NORMAL) || type.equals(TYPE.PREPARETEST)) {
                 if (versionControl != null) {
                     // Prepare for saving
                     for (Module module : modulesLoadedForUpdate) {
@@ -206,7 +211,9 @@ public class Main {
                 for (Module module : modulesLoadedForUpdate) {
                     module.save();
                 }
+            }
 
+            if (type.equals(TYPE.NORMAL)) {
                 if (versionControl != null) {
                     // Commit
                     for (Module module : modulesLoadedForUpdate) {
