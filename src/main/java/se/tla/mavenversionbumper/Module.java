@@ -200,7 +200,7 @@ public class Module {
         }
 
         if (dep == null) {
-            throw new IllegalArgumentException("No such dependency found");
+            throw new IllegalArgumentException("No such dependency found in " + gav() + ": " + moduleToUpdate.gav());
         }
 
         Element version = dep.getChild("version", nameSpace);
@@ -237,7 +237,7 @@ public class Module {
         }
 
         if (dep == null) {
-            throw new IllegalArgumentException("No such plugin dependency found");
+            throw new IllegalArgumentException("No such plugin dependency found in " + gav() + ": " + pluginToUpdate.gav());
         }
 
         Element version = dep.getChild("version", nameSpace);
