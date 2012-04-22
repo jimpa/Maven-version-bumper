@@ -42,7 +42,7 @@ public class Main {
 
     private static final List<Module> modulesLoadedForUpdate = new LinkedList<Module>();
 
-    private static String baseDir;
+    private static String baseDirName;
     private static VersionControl versionControl;
     private static final Map<String, Class<? extends VersionControl>> versionControllers;
 
@@ -58,6 +58,7 @@ public class Main {
         REVERT("Revert any uncommited changes.", "r", "revert"),
         PREPARETEST("Prepare module(s) for a test build.", "p", "prepare-test-build"),
         WARNOFSNAPSHOTS("Searches for any SNAPSHOT dependencies and warns about them. Works great with --dry-run.", "w", "warn-snapshots"),
+        REVERSEENGINEER("Build a basic scenario file from a set of modules.", "reverse-engineer"),
         HELP("Show help.", "h", "?", "help");
 
         private final String helpText;
@@ -93,6 +94,7 @@ public class Main {
                 acceptsAll(Option.PREPARETEST.getAliases(), Option.PREPARETEST.getHelpText());
                 acceptsAll(Option.REVERT.getAliases(), Option.REVERT.getHelpText());
                 acceptsAll(Option.WARNOFSNAPSHOTS.getAliases(), Option.WARNOFSNAPSHOTS.getHelpText());
+                acceptsAll(Option.REVERSEENGINEER.getAliases(), Option.REVERSEENGINEER.getHelpText());
                 acceptsAll(Option.HELP.getAliases(), Option.HELP.getHelpText());
             }
         };
@@ -115,19 +117,22 @@ public class Main {
             System.exit(0);
         }
 
-        if (Option.DRYRUN.presentIn(options) && Option.REVERT.presentIn(options)) {
-            System.err.println("Only one of --dry-run/-d and --revert/-r");
+        if (Option.DRYRUN.presentIn(options)
+                && Option.PREPARETEST.presentIn(options)
+                && Option.REVERT.presentIn(options)
+                && Option.REVERSEENGINEER.presentIn(options)) {
+            System.err.println("Only one of --dry-run/-d, --prepare-test-build/-p, --revert/-r and --reverse-engineer");
             System.exit(1);
         }
 
         List<String> arguments = options.nonOptionArguments();
 
         if (arguments.size() < 2 || arguments.size() > 3) {
-            System.err.println("Usage: [-d | --dry-run] [-p | --prepare-test-build] [-r | --revert] [-w | --warn-snapshot] [-h | --help] <base directory> <scenarioFile> [<VC properties file>]");
+            System.err.println("Usage: [-d | --dry-run] [-p | --prepare-test-build] [-r | --revert] [--reverse-engineer] [-w | --warn-snapshot] [-h | --help] <base directory> <scenarioFile> [<VC properties file>]");
             System.exit(1);
         }
 
-        baseDir = arguments.get(0);
+        baseDirName = arguments.get(0);
         String scenarioFileName = arguments.get(1);
         Properties versionControlProperties;
 
@@ -152,6 +157,31 @@ public class Main {
             }
         }
         File scenarioFile = new File(scenarioFileName);
+
+        if (Option.REVERSEENGINEER.presentIn(options)) {
+            if (scenarioFile.exists()) {
+                System.err.println("Scenario file " + scenarioFileName + " mustn't exist in reverse engineering mode.");
+                System.exit(1);
+            }
+
+            File baseDir = new File(baseDirName);
+            if (! baseDir.isDirectory()) {
+                System.err.println("Base directory " + baseDirName + " isn't a directory.");
+                System.exit(1);
+            }
+
+            try {
+                List<ReverseEngineeringModule> modules = findModulesForReverseEngineering(baseDir, "");
+
+                reverseEngineerModules(modules, scenarioFile);
+            } catch (JDOMException e) {
+                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            } catch (IOException e) {
+                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            }
+            return;
+        }
+
         if (!(scenarioFile.isFile() && scenarioFile.canRead())) {
             System.err.println("Scenario file " + scenarioFileName + " isn't a readable file.");
             System.exit(1);
@@ -180,7 +210,7 @@ public class Main {
             i.eval("import se.tla.mavenversionbumper.Main");
             i.eval("import se.tla.mavenversionbumper.Module");
             i.eval("import se.tla.mavenversionbumper.ReadonlyModule");
-            i.eval("baseDir = \"" + baseDir + "\"");
+            i.eval("baseDir = \"" + baseDirName + "\"");
             i.eval("load(String moduleName) { return Main.load(moduleName, null, null); }");
             i.eval("load(String moduleName, String newVersion) { return Main.load(moduleName, newVersion, null); }");
             i.eval("load(String moduleName, String newVersion, String label) { return Main.load(moduleName, newVersion, label); }");
@@ -232,11 +262,46 @@ public class Main {
                     }
                 }
             }
-        } catch (EvalError evalError) {
-            evalError.printStackTrace();
+        } catch (EvalError e) {
+            e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public static List<ReverseEngineeringModule> findModulesForReverseEngineering(File baseDir, String modulePath) throws JDOMException, IOException {
+        List<ReverseEngineeringModule> result = new LinkedList<ReverseEngineeringModule>();
+
+        ReverseEngineeringModule m = new ReverseEngineeringModule(baseDir, modulePath);
+        result.add(m);
+
+        List<String> subModules = m.subModules();
+        for (String subModule : subModules) {
+            String subModulePath = (modulePath.isEmpty() ? subModule : modulePath + "/" + subModule);
+            result.addAll(findModulesForReverseEngineering(baseDir, subModulePath));
+        }
+
+        return result;
+    }
+
+    public static void reverseEngineerModules(List<ReverseEngineeringModule> modules, File scenarioFile) throws IOException {
+        StringBuilder builder = new StringBuilder();
+        for (ReverseEngineeringModule module : modules) {
+            builder.append(module.moduleName() + " = load(\"" + module.path() + "\", \"" + module.version() + "\");\n");
+            ReverseEngineeringModule parent = module.detectParent(modules);
+            if (parent != null) {
+                builder.append(module.moduleName() + ".updateParent(" + parent.moduleName()+ ");\n");
+            }
+            for (ReverseEngineeringModule dependency : module.findDependencies(modules)) {
+                builder.append(module.moduleName() + ".updateDependency(" + dependency.moduleName() + ");\n");
+            }
+            for (ReverseEngineeringModule dependency : module.findPluginDependencies(modules)) {
+                builder.append(module.moduleName() + ".updatePluginDependency(" + dependency.moduleName() + ");\n");
+            }
+            builder.append("\n");
+        }
+
+        FileUtils.write(scenarioFile, builder.toString(), "ISO-8859-1");
     }
 
     /**
@@ -250,7 +315,7 @@ public class Main {
      * @throws IOException if the modules pom.xml couldn't be read.
      */
     public static Module load(String moduleDirectoryName, String newVersion, String label) throws JDOMException, IOException {
-        Module m = new Module(baseDir, moduleDirectoryName);
+        Module m = new Module(baseDirName, moduleDirectoryName);
 
         if (newVersion != null) {
             System.out.println("ORG: " + m.gav());

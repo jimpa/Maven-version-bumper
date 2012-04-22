@@ -38,9 +38,9 @@ public class Module {
     private static final String SNAPSHOTPATTERN = "-SNAPSHOT";
     final private Document document;
     final private File pomFile;
-    final private Element root;
-    final private Namespace nameSpace;
-    final private String moduleName;
+    final protected Element root;
+    final protected Namespace nameSpace;
+    final protected String moduleName;
     final private String originalVersion;
     private String label;
     private String commitMessage;
@@ -55,19 +55,25 @@ public class Module {
      * @throws IOException Problem reading the pom.xml file.
      */
     public Module(String baseDirName, String moduleName) throws JDOMException, IOException {
+        if (moduleName == null) {
+            moduleName = "";
+        }
         this.moduleName = moduleName;
         File dir = openDir(null, baseDirName);
         if (moduleName.length() > 0) {
             dir = openDir(dir, moduleName);
         }
-        File baseDir = dir;
-        pomFile = new File(baseDir, "pom.xml");
+        pomFile = new File(dir, "pom.xml");
         SAXBuilder builder = new SAXBuilder();
         document = builder.build(pomFile);
         root = document.getRootElement();
         nameSpace = root.getNamespace();
         originalVersion = version();
     }
+
+//    public Module(File baseDir) throws JDOMException, IOException {
+//        this(baseDir.getAbsolutePath(), null);
+//    }
 
     /**
      * Constructor used only by the sub class ReadonlyModule to satisfy the compiler. Should never be used.
@@ -163,10 +169,24 @@ public class Module {
     /**
      * Update the parent version to that of this Module.
      *
-     * @param parent Use this modules version.
+     * @param newParent Use this modules version.
      */
-    public void parentVersion(Module parent) {
-        parentVersion(parent.version());
+    public void parentVersion(Module newParent) {
+        Element existingParent = root.getChild("parent", nameSpace);
+        if (existingParent == null) {
+            throw new IllegalArgumentException("No parent in module " + gav() + ". Can't update version.");
+        }
+        String existingGroupId = existingParent.getChild("groupId", nameSpace).getText();
+        String existingArtifactId = existingParent.getChild("artifactId", nameSpace).getText();
+        if ((! newParent.groupId().equals(existingGroupId)) || (! newParent.artifactId().equals(existingArtifactId))) {
+            throw new IllegalArgumentException("No such parent in " + gav() + ": " + newParent.gav());
+        }
+
+        Element version = existingParent.getChild("version", nameSpace);
+        if (version == null) {
+            throw new IllegalStateException("No version defined for parent.");
+        }
+        version.setText(newParent.version());
     }
 
     private String myOrParent(String itemName) {
@@ -246,9 +266,12 @@ public class Module {
                     ". Probably defined elsewhere in a pluginManagement.");
         }
 
-        if (version.getText().startsWith("${") && version.getText().endsWith("}")) {
-            throw new IllegalArgumentException("In " + gav() + ", the plugin dependency to " + pluginToUpdate.gav() +
-                    "'s version is controlled by a property. Use updateProperty instead.");
+        String versionText = version.getText();
+        if (versionText.startsWith("${") && versionText.endsWith("}")) {
+            String propertyName = versionText.substring(2).substring(0, versionText.length() - 3);
+
+            updateProperty(propertyName, pluginToUpdate.version());
+            return;
         }
 
         version.setText(pluginToUpdate.version());
@@ -322,11 +345,11 @@ public class Module {
     }
 
     private Element findDependencyElement(Module moduleToFind, String ... path) {
-        for (Element dep : getDependencyElements(path)) {
+        for (Element dep : getChildElements(path)) {
             String groupId = dep.getChildText("groupId", nameSpace);
             String artifactId = dep.getChildText("artifactId", nameSpace);
 
-            if (groupId.equals(moduleToFind.groupId()) && artifactId.equals(moduleToFind.artifactId())) {
+            if (moduleToFind.groupId().equals(groupId) && moduleToFind.artifactId().equals(artifactId)) {
                 return dep;
             }
         }
@@ -334,7 +357,7 @@ public class Module {
         return null;
     }
 
-    private List<Element> getDependencyElements(String ... path) {
+    private List<Element> getChildElements(String... path) {
         Element cur = root;
 
         for (String pathPart : path) {
@@ -373,7 +396,7 @@ public class Module {
         }
 
         // Dependencies
-        for (Element dep : getDependencyElements("dependencies")) {
+        for (Element dep : getChildElements("dependencies")) {
             String version = extractText(dep, "version");
             if (version != null && version.endsWith(SNAPSHOTPATTERN)) {
                 result.add("Dependency " + extractText(dep, "groupId") + ":" + extractText(dep, "artifactId") + ":" + version);
@@ -381,7 +404,7 @@ public class Module {
         }
 
         // Dependency management
-        for (Element dep : getDependencyElements("dependencyManagement", "dependencies")) {
+        for (Element dep : getChildElements("dependencyManagement", "dependencies")) {
             String version = extractText(dep, "version");
             if (version != null && version.endsWith(SNAPSHOTPATTERN)) {
                 result.add("Dependency management " + extractText(dep, "groupId") + ":" + extractText(dep, "artifactId") + ":" + version);
@@ -389,7 +412,7 @@ public class Module {
         }
 
         // Plugins
-        for (Element dep : getDependencyElements("build", "plugins")) {
+        for (Element dep : getChildElements("build", "plugins")) {
             String version = extractText(dep, "version");
             if (version != null && version.endsWith(SNAPSHOTPATTERN)) {
                 result.add("Plugin " + extractText(dep, "groupId") + ":" + extractText(dep, "artifactId") + ":" + version);
@@ -397,7 +420,7 @@ public class Module {
         }
 
         // Plugin management
-        for (Element dep : getDependencyElements("build", "pluginManagement", "plugins")) {
+        for (Element dep : getChildElements("build", "pluginManagement", "plugins")) {
             String version = extractText(dep, "version");
             if (version != null && version.endsWith(SNAPSHOTPATTERN)) {
                 result.add("Plugin management " + extractText(dep, "groupId") + ":" + extractText(dep, "artifactId") + ":" + version);

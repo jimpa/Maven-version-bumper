@@ -86,6 +86,19 @@ public class ModuleTest {
     }
 
     @Test
+    public void testParentUpdateWithWrongModule() throws Exception {
+        Module subject = new Module("target/test-classes/sources", "withparent");
+        Module parent = new Module("target/test-classes/sources", "withproperty");
+
+        try {
+            subject.parentVersion(parent);
+            Assert.fail();
+        } catch (IllegalArgumentException e) {
+            // Expected
+        }
+    }
+
+    @Test
     public void testSetParentVersion() throws Exception {
         ModuleTestTemplate.template("withparent", "withparent.xml", new ModuleTinker() {
             @Override
@@ -177,12 +190,23 @@ public class ModuleTest {
     }
 
     @Test
-    public void testUpdatePropertyAsProperty() throws Exception {
+    public void testUpdateDependencyAsProperty() throws Exception {
         final Module depmod = new Module("target/test-classes", "simple");
         ModuleTestTemplate.template("dependencyAsProperty", "dependencyAsProperty.xml", new ModuleTinker() {
             @Override
             public void tink(Module subject) {
                 subject.updateDependency(depmod);
+            }
+        });
+    }
+
+    @Test
+    public void testUpdatePluginAsProperty() throws Exception {
+        final Module depmod = new Module("target/test-classes", "simple");
+        ModuleTestTemplate.template("pluginAsProperty", "pluginAsProperty.xml", new ModuleTinker() {
+            @Override
+            public void tink(Module subject) {
+                subject.updatePluginDependency(depmod);
             }
         });
     }

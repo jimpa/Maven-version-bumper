@@ -88,7 +88,7 @@ public class ReadonlyModule extends Module {
     }
 
     @Override
-    public void parentVersion(Module parent) {
+    public void parentVersion(Module newParent) {
         throw new UnsupportedOperationException("No supported in readonly modules");
     }
 

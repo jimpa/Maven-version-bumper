@@ -1,0 +1,16 @@
+base = load("", "1.2");
+
+moduleA = load("moduleA", "1.2");
+moduleA.updateParent(base);
+
+moduleB = load("moduleA/moduleB", "9.1-SNAPSHOT");
+moduleB.updateParent(moduleA);
+
+moduleD = load("moduleA/moduleD", "9.1-SNAPSHOT");
+moduleD.updateParent(moduleA);
+
+moduleC = load("moduleC", "9.1-SNAPSHOT");
+moduleC.updateParent(base);
+moduleC.updateDependency(moduleB);
+moduleC.updatePluginDependency(moduleD);
+
