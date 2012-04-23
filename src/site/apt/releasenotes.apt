@@ -47,9 +47,17 @@ Release Notes
 
   Several more bug fixes.
 
+  Added a snapshot detector option useful to parse through the loaded modules and looking for any version ending in
+  the string "-SNAPSHOT". This is useful to detect any missing relationship in the scenario file.
+
+* 1.3
+  Added a possibility to handle dependencies/plugin dependencies where the version is controlled by properties in the
+  same manner as normal dependencies.
+
+  Added a reverse engineering mode that can look at a module hierarchy and produce a suggestion for a scenario file.
+
   Added the possibility to prepare the pom.xml-files but not commiting them back into the version control. Useful
   to prapare a set of modules for a test build. After a successful test build, the revert option can be used to restore
   the modules to it's original state before doing the sharp run that commits everything back into the version control.
 
-  Added a snapshot detector option useful to parse through the loaded modules and looking for any version ending in
-  the string "-SNAPSHOT". This is useful to detect any missing relationship in the scenario file.
+  Several bug fixes.

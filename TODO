@@ -6,11 +6,10 @@ to be fixed for it to be the tool that the author envisioned it to be.
 
 1 - Feature: scenarios needs to be restartable and the steps already completed needs to be skipped.
   If during a run of a scenario somethings breaks, it should be easy to just resume the scenario from where it broke.
+  The need for this is mostly centered around the version control operations.
 
 2 - More version control systems needs to be implemented.
   * Subversion
   * CVS (?)
 
 3 - Load VCS via path
-
-4 - Option to do presave and save, but not commit/label for test runs..
