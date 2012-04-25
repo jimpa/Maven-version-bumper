@@ -19,7 +19,12 @@ package se.tla.mavenversionbumper;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
 
 import joptsimple.OptionException;
 import joptsimple.OptionParser;
@@ -31,6 +36,7 @@ import org.jdom.JDOMException;
 import se.tla.mavenversionbumper.vcs.AbstractVersionControl;
 import se.tla.mavenversionbumper.vcs.Clearcase;
 import se.tla.mavenversionbumper.vcs.Git;
+import se.tla.mavenversionbumper.vcs.NoopVersionControl;
 import se.tla.mavenversionbumper.vcs.VersionControl;
 import bsh.EvalError;
 import bsh.Interpreter;
@@ -43,7 +49,7 @@ public class Main {
     private static final List<Module> modulesLoadedForUpdate = new LinkedList<Module>();
 
     private static String baseDirName;
-    private static VersionControl versionControl;
+    private static VersionControl versionControl = new NoopVersionControl();
     private static final Map<String, Class<? extends VersionControl>> versionControllers;
 
     static {
@@ -165,7 +171,7 @@ public class Main {
             }
 
             File baseDir = new File(baseDirName);
-            if (! baseDir.isDirectory()) {
+            if (!baseDir.isDirectory()) {
                 System.err.println("Base directory " + baseDirName + " isn't a directory.");
                 System.exit(1);
             }
@@ -230,9 +236,7 @@ public class Main {
             }
 
             if (type.equals(TYPE.NORMAL) || type.equals(TYPE.PREPARETEST)) {
-                if (versionControl != null) {
-                    versionControl.before(modulesLoadedForUpdate);
-                }
+                versionControl.before(modulesLoadedForUpdate);
 
                 // Save
                 for (Module module : modulesLoadedForUpdate) {
@@ -241,22 +245,13 @@ public class Main {
             }
 
             if (type.equals(TYPE.NORMAL)) {
-                if (versionControl != null) {
-                    // Commit
-                    versionControl.commit(modulesLoadedForUpdate);
-
-                    // Label
-                    versionControl.label(modulesLoadedForUpdate);
-
-                    // After all is done.
-                    versionControl.after(modulesLoadedForUpdate);
-                }
+                versionControl.commit(modulesLoadedForUpdate);
+                versionControl.label(modulesLoadedForUpdate);
+                versionControl.after(modulesLoadedForUpdate);
             }
 
             if (type.equals(TYPE.REVERT)) {
-                if (versionControl != null) {
-                    versionControl.restore(modulesLoadedForUpdate);
-                }
+                versionControl.restore(modulesLoadedForUpdate);
             }
         } catch (EvalError e) {
             e.printStackTrace();
@@ -265,7 +260,7 @@ public class Main {
         }
     }
 
-    private static int countTrues(boolean ... bs) {
+    private static int countTrues(boolean... bs) {
         int result = 0;
         for (boolean b : bs) {
             if (b) {
@@ -314,11 +309,11 @@ public class Main {
      * Create a Module located by this filename that is a directory relative to the baseDir.
      *
      * @param moduleDirectoryName Name of base directory for the module.
-     * @param newVersion New version to set directly, of null if no version should be set.
-     * @param label New label to set directly, or null if no labeling should be performed.
+     * @param newVersion          New version to set directly, of null if no version should be set.
+     * @param label               New label to set directly, or null if no labeling should be performed.
      * @return Newly created Module.
      * @throws JDOMException If the modules pom.xml couldn't be parsed.
-     * @throws IOException if the modules pom.xml couldn't be read.
+     * @throws IOException   if the modules pom.xml couldn't be read.
      */
     public static Module load(String moduleDirectoryName, String newVersion, String label) throws JDOMException, IOException {
         Module m = new Module(baseDirName, moduleDirectoryName);
