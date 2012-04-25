@@ -1,7 +1,7 @@
 Thing coming in the near future
 ===============================
 
-Version bumper has been released as 1.1 and through that process a few short comings has been identified that needs
+Version bumper has been released and through that process a few short comings has been identified that needs
 to be fixed for it to be the tool that the author envisioned it to be.
 
 1 - Feature: scenarios needs to be restartable and the steps already completed needs to be skipped.
