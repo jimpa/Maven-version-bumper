@@ -65,7 +65,7 @@ public class Clearcase extends AbstractVersionControl {
         for (Module module : modules) {
             String label = module.label();
             if (label != null && label.length() > 0) {
-                sb.append("element * " + label + "\n");
+                sb.append("element * ").append(label).append("\n");
             }
         }
         if (sb.length() > 0) {

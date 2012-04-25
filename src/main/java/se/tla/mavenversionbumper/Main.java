@@ -175,9 +175,9 @@ public class Main {
 
                 reverseEngineerModules(modules, scenarioFile);
             } catch (JDOMException e) {
-                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                e.printStackTrace();
             } catch (IOException e) {
-                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                e.printStackTrace();
             }
             return;
         }
@@ -268,7 +268,9 @@ public class Main {
     private static int countTrues(boolean ... bs) {
         int result = 0;
         for (boolean b : bs) {
-            result++;
+            if (b) {
+                result++;
+            }
         }
         return result;
     }
@@ -291,16 +293,16 @@ public class Main {
     public static void reverseEngineerModules(List<ReverseEngineeringModule> modules, File scenarioFile) throws IOException {
         StringBuilder builder = new StringBuilder();
         for (ReverseEngineeringModule module : modules) {
-            builder.append(module.moduleName() + " = load(\"" + module.path() + "\", \"" + module.version() + "\");\n");
+            builder.append(module.moduleName()).append(" = load(\"").append(module.path()).append("\", \"").append(module.version()).append("\");\n");
             ReverseEngineeringModule parent = module.detectParent(modules);
             if (parent != null) {
-                builder.append(module.moduleName() + ".updateParent(" + parent.moduleName()+ ");\n");
+                builder.append(module.moduleName()).append(".updateParent(").append(parent.moduleName()).append(");\n");
             }
             for (ReverseEngineeringModule dependency : module.findDependencies(modules)) {
-                builder.append(module.moduleName() + ".updateDependency(" + dependency.moduleName() + ");\n");
+                builder.append(module.moduleName()).append(".updateDependency(").append(dependency.moduleName()).append(");\n");
             }
             for (ReverseEngineeringModule dependency : module.findPluginDependencies(modules)) {
-                builder.append(module.moduleName() + ".updatePluginDependency(" + dependency.moduleName() + ");\n");
+                builder.append(module.moduleName()).append(".updatePluginDependency(").append(dependency.moduleName()).append(");\n");
             }
             builder.append("\n");
         }
