@@ -18,7 +18,7 @@ package se.tla.mavenversionbumper.vcs;
 
 import se.tla.mavenversionbumper.Module;
 
-import java.util.Collection;
+import java.util.List;
 
 /**
  * Defines common functionality needed from a Version Control System.
@@ -26,37 +26,36 @@ import java.util.Collection;
 public interface VersionControl {
 
     /**
-     * This module is about to be written. Please prepare.
-     * @param module Module.
+     * Called before any work is done in the Version Control.
+     * @param modules Modules to prepare for.
      */
-    void prepareSave(Module module);
+    void before(List<Module> modules);
 
     /**
-     * Use the Version Control System to revert any changes made to this module.
+     * Called after all other work is done in the Version Control.
+     * @param modules Modules that has been handled by the Version Control.
+     */
+    void after(List<Module> modules);
+
+    /**
+     * Use the Version Control System to revert any changes made to these modules.
      *
-     * This method only backs out changes that havn't been commited and it does not
+     * This method only backs out changes that haven't been commited and it does not
      * affect any labels that has been applied.
      *
-     * @param module Revert changes for this module.
+     * @param modules Revert changes for these modules.
      */
-    void restore(Module module);
+    void restore(List<Module> modules);
 
     /**
      * Commit these modules to the Version Control System.
-     * @param module Module.
+     * @param modules Modules.
      */
-    void commit(Module module);
+    void commit(List<Module> modules);
 
     /**
      * Apply any labels that has been registered in these modules.
      * @param modules Modules.
      */
-    @SuppressWarnings("UnusedDeclaration")
-    void label(Module ... modules);
-
-    /**
-     * Apply any labels that has been registered in these modules.
-     * @param modules Modules.
-     */
-    void label(Collection<Module> modules);
+    void label(List<Module> modules);
 }

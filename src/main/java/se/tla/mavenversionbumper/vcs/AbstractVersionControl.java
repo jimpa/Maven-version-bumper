@@ -18,8 +18,7 @@ package se.tla.mavenversionbumper.vcs;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.Collection;
+import java.util.List;
 
 import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.DefaultExecutor;
@@ -39,16 +38,16 @@ public abstract class AbstractVersionControl implements VersionControl {
      * {@inheritDoc}
      */
     @Override
-    public void prepareSave(Module module) {
-        // Default is to do nothing before saving.
+    public void before(List<Module> modules) {
+        // Default is to do nothing.
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void label(Module... modules) {
-        label(Arrays.asList(modules));
+    public void after(List<Module> modules) {
+        // Default is to do nothing.
     }
 
     /**

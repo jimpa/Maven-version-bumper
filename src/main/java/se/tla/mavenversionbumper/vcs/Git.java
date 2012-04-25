@@ -20,7 +20,10 @@ import org.apache.commons.exec.CommandLine;
 import se.tla.mavenversionbumper.Module;
 
 import java.io.File;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
 
 /**
  * Implements VersionControl for the Git versioning system.
@@ -48,51 +51,55 @@ public class Git extends AbstractVersionControl {
      * {@inheritDoc}
      */
     @Override
-    public void restore(Module module) {
-        File parentDir = module.pomFile().getParentFile();
+    public void restore(List<Module> modules) {
+        for (Module module : modules) {
+            File parentDir = module.pomFile().getParentFile();
 
-        Map<String, Object> map = new HashMap<String, Object>();
-        map.put("file", module.pomFile().getName());
+            Map<String, Object> map = new HashMap<String, Object>();
+            map.put("file", module.pomFile().getName());
 
-        CommandLine cmdLine = new CommandLine(commandPath);
-        cmdLine.addArgument("checkout");
-        cmdLine.addArgument("${file}");
-        cmdLine.setSubstitutionMap(map);
+            CommandLine cmdLine = new CommandLine(commandPath);
+            cmdLine.addArgument("checkout");
+            cmdLine.addArgument("${file}");
+            cmdLine.setSubstitutionMap(map);
 
-        execute(cmdLine, parentDir);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void commit(Module module) {
-
-        if (! module.pomFile().exists()) {
-            throw new IllegalArgumentException("File to commit does not exist.");
+            execute(cmdLine, parentDir);
         }
-
-        File parentDir = module.pomFile().getParentFile();
-
-        Map<String, Object> map = new HashMap<String, Object>();
-        map.put("file", module.pomFile().getName());
-        map.put("message", module.commitMessage());
-
-        CommandLine cmdLine = new CommandLine(commandPath);
-        cmdLine.addArgument("commit");
-        cmdLine.addArgument("-m");
-        cmdLine.addArgument("${message}");
-        cmdLine.addArgument("${file}");
-        cmdLine.setSubstitutionMap(map);
-
-        execute(cmdLine, parentDir);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void label(Collection<Module> modules) {
+    public void commit(List<Module> modules) {
+        for (Module module : modules) {
+
+            if (!module.pomFile().exists()) {
+                throw new IllegalArgumentException("File to commit does not exist.");
+            }
+
+            File parentDir = module.pomFile().getParentFile();
+
+            Map<String, Object> map = new HashMap<String, Object>();
+            map.put("file", module.pomFile().getName());
+            map.put("message", module.commitMessage());
+
+            CommandLine cmdLine = new CommandLine(commandPath);
+            cmdLine.addArgument("commit");
+            cmdLine.addArgument("-m");
+            cmdLine.addArgument("${message}");
+            cmdLine.addArgument("${file}");
+            cmdLine.setSubstitutionMap(map);
+
+            execute(cmdLine, parentDir);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void label(List<Module> modules) {
         for (Module module : modules) {
             String label = module.label();
             if (label != null && label.length() > 0) {

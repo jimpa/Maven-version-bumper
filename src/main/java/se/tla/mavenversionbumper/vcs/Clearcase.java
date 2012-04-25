@@ -1,7 +1,14 @@
 package se.tla.mavenversionbumper.vcs;
 
 import java.io.File;
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+import java.util.Set;
+
 
 import org.apache.commons.exec.CommandLine;
 import se.tla.mavenversionbumper.Module;
@@ -43,7 +50,36 @@ public class Clearcase extends AbstractVersionControl {
      * {@inheritDoc}
      */
     @Override
-    public void prepareSave(Module module) {
+    public void before(List<Module> modules) {
+        for (Module module: modules) {
+            checkout(module);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void after(List<Module> modules) {
+        StringBuilder sb = new StringBuilder();
+        for (Module module : modules) {
+            String label = module.label();
+            if (label != null && label.length() > 0) {
+                sb.append("element * " + label + "\n");
+            }
+        }
+        if (sb.length() > 0) {
+            System.out.println("element * CHECKEDOUT");
+            System.out.print(sb.toString());
+            System.out.println("element * /main/LATEST");
+        }
+    }
+
+    /**
+     * Perform a checkout of the specific modules pom.xml file.
+     * @param module Module to perform the checkout for.
+     */
+    private void checkout(Module module) {
         if (! checkedOut.contains(module)) {
             Map<String, Object> map = new HashMap<String, Object>();
             map.put("file", module.pomFile());
@@ -60,57 +96,62 @@ public class Clearcase extends AbstractVersionControl {
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void restore(Module module) {
-        Map<String, Object> map = new HashMap<String, Object>();
-        map.put("file", module.pomFile());
-
-        CommandLine cmdLine = new CommandLine(commandPath);
-        cmdLine.addArgument("uncheckout");
-        cmdLine.addArgument("-rm");
-        cmdLine.addArgument("${file}");
-        cmdLine.setSubstitutionMap(map);
-
-        execute(cmdLine, null);
-
-        checkedOut.remove(module);
-    }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void commit(Module module) {
-        Map<String, Object> map = new HashMap<String, Object>();
-        map.put("file", module.pomFile());
+    public void restore(List<Module> modules) {
+        for (Module module : modules) {
+            Map<String, Object> map = new HashMap<String, Object>();
+            map.put("file", module.pomFile());
 
-        CommandLine cmdLine = new CommandLine(commandPath);
-        cmdLine.addArgument("checkin");
-        String message = module.commitMessage();
-        if (message != null && message.length() > 0) {
-        	cmdLine.addArgument("-c");
-        	cmdLine.addArgument("${comment}");
-        	map.put("comment", message);
-        } else {
-            cmdLine.addArgument("-nc");
+            CommandLine cmdLine = new CommandLine(commandPath);
+            cmdLine.addArgument("uncheckout");
+            cmdLine.addArgument("-rm");
+            cmdLine.addArgument("${file}");
+            cmdLine.setSubstitutionMap(map);
+
+            execute(cmdLine, null);
+
+            checkedOut.remove(module);
         }
-        cmdLine.addArgument("${file}");
-        cmdLine.setSubstitutionMap(map);
-
-        execute(cmdLine, null);
-
-        checkedOut.remove(module);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void label(Collection<Module> modules) {
-        Collection<Module> modulesToLabel = new LinkedList<Module>();
+    public void commit(List<Module> modules) {
+        for (Module module : modules) {
+            Map<String, Object> map = new HashMap<String, Object>();
+            map.put("file", module.pomFile());
+
+            CommandLine cmdLine = new CommandLine(commandPath);
+            cmdLine.addArgument("checkin");
+            String message = module.commitMessage();
+            if (message != null && message.length() > 0) {
+                cmdLine.addArgument("-c");
+                cmdLine.addArgument("${comment}");
+                map.put("comment", message);
+            } else {
+                cmdLine.addArgument("-nc");
+            }
+            cmdLine.addArgument("${file}");
+            cmdLine.setSubstitutionMap(map);
+
+            execute(cmdLine, null);
+
+            checkedOut.remove(module);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void label(List<Module> modules) {
+        List<Module> modulesToLabel = new LinkedList<Module>();
         for (Module module : modules) {
             String label = module.label();
             if (label != null && label.length() > 0) {

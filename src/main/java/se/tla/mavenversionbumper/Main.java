@@ -117,10 +117,10 @@ public class Main {
             System.exit(0);
         }
 
-        if (Option.DRYRUN.presentIn(options)
-                && Option.PREPARETEST.presentIn(options)
-                && Option.REVERT.presentIn(options)
-                && Option.REVERSEENGINEER.presentIn(options)) {
+        if (countTrues(Option.DRYRUN.presentIn(options),
+                Option.PREPARETEST.presentIn(options),
+                Option.REVERT.presentIn(options),
+                Option.REVERSEENGINEER.presentIn(options)) > 1) {
             System.err.println("Only one of --dry-run/-d, --prepare-test-build/-p, --revert/-r and --reverse-engineer");
             System.exit(1);
         }
@@ -231,10 +231,7 @@ public class Main {
 
             if (type.equals(TYPE.NORMAL) || type.equals(TYPE.PREPARETEST)) {
                 if (versionControl != null) {
-                    // Prepare for saving
-                    for (Module module : modulesLoadedForUpdate) {
-                        versionControl.prepareSave(module);
-                    }
+                    versionControl.before(modulesLoadedForUpdate);
                 }
 
                 // Save
@@ -246,20 +243,19 @@ public class Main {
             if (type.equals(TYPE.NORMAL)) {
                 if (versionControl != null) {
                     // Commit
-                    for (Module module : modulesLoadedForUpdate) {
-                        versionControl.commit(module);
-                    }
+                    versionControl.commit(modulesLoadedForUpdate);
 
                     // Label
                     versionControl.label(modulesLoadedForUpdate);
+
+                    // After all is done.
+                    versionControl.after(modulesLoadedForUpdate);
                 }
             }
 
             if (type.equals(TYPE.REVERT)) {
                 if (versionControl != null) {
-                    for (Module module : modulesLoadedForUpdate) {
-                        versionControl.restore(module);
-                    }
+                    versionControl.restore(modulesLoadedForUpdate);
                 }
             }
         } catch (EvalError e) {
@@ -267,6 +263,14 @@ public class Main {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    private static int countTrues(boolean ... bs) {
+        int result = 0;
+        for (boolean b : bs) {
+            result++;
+        }
+        return result;
     }
 
     public static List<ReverseEngineeringModule> findModulesForReverseEngineering(File baseDir, String modulePath) throws JDOMException, IOException {

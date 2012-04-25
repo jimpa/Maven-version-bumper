@@ -61,3 +61,8 @@ Release Notes
   the modules to it's original state before doing the sharp run that commits everything back into the version control.
 
   Several bug fixes.
+
+* 1.4
+  Several bug fixes.
+
+  Added generation of suggestion of Clearcase Config Spec with all the created labels.
