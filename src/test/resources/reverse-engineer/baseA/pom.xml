@@ -3,13 +3,18 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>grp</groupId>
-    <artifactId>base</artifactId>
+    <artifactId>baseA</artifactId>
     <version>1.2</version>
     <packaging>pom</packaging>
 
-    <modules>
-        <module>baseA</module>
-        <module>baseB</module>
-    </modules>
+    <parent>
+        <groupId>grp</groupId>
+        <artifactId>base</artifactId>
+        <version>1.2</version>
+    </parent>
 
+    <modules>
+        <module>baseAA</module>
+        <module>baseAB</module>
+    </modules>
 </project>

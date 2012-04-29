@@ -20,11 +20,13 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.TreeSet;
 
 import joptsimple.OptionException;
 import joptsimple.OptionParser;
@@ -288,18 +290,11 @@ public class Main {
     public static void reverseEngineerModules(List<ReverseEngineeringModule> modules, File scenarioFile) throws IOException {
         StringBuilder builder = new StringBuilder();
         for (ReverseEngineeringModule module : modules) {
-            builder.append(module.moduleName()).append(" = load(\"").append(module.path()).append("\", \"").append(module.version()).append("\");\n");
-            ReverseEngineeringModule parent = module.detectParent(modules);
-            if (parent != null) {
-                builder.append(module.moduleName()).append(".updateParent(").append(parent.moduleName()).append(");\n");
-            }
-            for (ReverseEngineeringModule dependency : module.findDependencies(modules)) {
-                builder.append(module.moduleName()).append(".updateDependency(").append(dependency.moduleName()).append(");\n");
-            }
-            for (ReverseEngineeringModule dependency : module.findPluginDependencies(modules)) {
-                builder.append(module.moduleName()).append(".updatePluginDependency(").append(dependency.moduleName()).append(");\n");
-            }
-            builder.append("\n");
+            module.consider(modules);
+        }
+
+        for (ReverseEngineeringModule module : new TreeSet<ReverseEngineeringModule>(modules)) {
+            builder.append(module.toString());
         }
 
         FileUtils.write(scenarioFile, builder.toString(), "ISO-8859-1");
