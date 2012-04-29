@@ -195,7 +195,7 @@ public class Main {
             System.exit(1);
         }
 
-        if (Option.REVERT.presentIn(options) && versionControl == null) {
+        if (Option.REVERT.presentIn(options) && versionControl instanceof NoopVersionControl) {
             System.err.println("Version control has to be defined while reverting.");
             System.exit(1);
         }
