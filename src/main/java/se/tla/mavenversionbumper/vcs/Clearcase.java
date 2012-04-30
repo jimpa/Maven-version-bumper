@@ -21,6 +21,7 @@ import se.tla.mavenversionbumper.Module;
 public class Clearcase extends AbstractVersionControl {
 
     private static final String COMMANDPATH = "cleartool.path";
+    private static final String COMMANDPATHDEFAULT = "cleartool";
     private static final String LABELTIMEOUT = "cleartool.labeltimeout";
     private static final String LABELDEFAULTTIMEOUT = "900000"; // 15 minutes.
 
@@ -29,16 +30,14 @@ public class Clearcase extends AbstractVersionControl {
     private final int labelTimeout;
 
     public Clearcase(Properties controlProperties) {
-        this.commandPath = controlProperties.getProperty(COMMANDPATH);
-        if (commandPath == null) {
-            throw new IllegalArgumentException("No " + COMMANDPATH + " defined for cleartool executable");
+        String commandProperty = controlProperties.getProperty(COMMANDPATH, COMMANDPATHDEFAULT);
+        if (System.getProperty("os.name").toLowerCase().contains("windows") &&
+                commandProperty.toLowerCase().endsWith(".exe")) {
+            commandProperty += ".exe";
         }
+        commandPath = commandProperty;
 
-        if (! new File(commandPath).exists()) {
-            throw new IllegalArgumentException(COMMANDPATH + " " + commandPath + " doesn't exist");
-        }
         String timeoutProperty = controlProperties.getProperty(LABELTIMEOUT, LABELDEFAULTTIMEOUT);
-
         try {
             this.labelTimeout = Integer.parseInt(timeoutProperty);
         } catch (NumberFormatException e) {

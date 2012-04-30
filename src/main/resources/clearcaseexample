@@ -1,6 +1,7 @@
 versioncontrol=clearcase
 #
-cleartool.path=/bin/echo
+# If the cleartool command isn't part of your PATH, you can specify its location with this property.
+# cleartool.path=cleartool
 
 # Default timeout for the label command is 15 minutes.
 #cleartool.labeltimeout=900000

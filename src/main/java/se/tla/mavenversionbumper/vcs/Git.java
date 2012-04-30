@@ -33,18 +33,17 @@ import java.util.Properties;
 public class Git extends AbstractVersionControl {
 
     private static final String COMMANDPATH = "git.path";
+    private static final String COMMANDPATHDEFAULT = "git";
 
     private final String commandPath;
 
     public Git(Properties controlProperties) {
-        this.commandPath = controlProperties.getProperty(COMMANDPATH);
-        if (commandPath == null) {
-            throw new IllegalArgumentException("No " + COMMANDPATH + " defined for git executable");
+        String commandProperty = controlProperties.getProperty(COMMANDPATH, COMMANDPATHDEFAULT);
+        if (System.getProperty("os.name").toLowerCase().contains("windows") &&
+                commandProperty.toLowerCase().endsWith(".exe")) {
+            commandProperty += ".exe";
         }
-
-        if (! new File(commandPath).exists()) {
-            throw new IllegalArgumentException(COMMANDPATH + " " + commandPath + " doesn't exist");
-        }
+        commandPath = commandProperty;
     }
 
     /**

@@ -1,3 +1,4 @@
 versioncontrol=git
 #
-git.path=/usr/local/git/bin/git
+# If the git command isn't part of your PATH, you can specify its location with this property.
+# git.path=git
