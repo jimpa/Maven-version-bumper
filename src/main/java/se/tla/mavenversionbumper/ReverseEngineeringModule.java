@@ -54,7 +54,7 @@ public class ReverseEngineeringModule extends Module implements Comparable<Rever
     }
 
     public String moduleName() {
-        return artifactId();
+        return artifactId().replaceAll("[-]", "");
     }
 
     public String path() {
