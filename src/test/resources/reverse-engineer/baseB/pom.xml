@@ -2,33 +2,20 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>grp</groupId>
+    <groupId>commonsconfigtest</groupId>
     <artifactId>baseB</artifactId>
-    <version>9.1-SNAPSHOT</version>
+    <version>1.2</version>
+    <packaging>pom</packaging>
 
     <parent>
-        <groupId>grp</groupId>
-        <artifactId>base</artifactId>
-        <version>1.2</version>
+      <groupId>commonsconfigtest</groupId>
+      <artifactId>base</artifactId>
+      <version>1.2</version>
     </parent>
 
-    <dependencies>
-        <dependency>
-            <groupId>grp</groupId>
-            <artifactId>baseAA</artifactId>
-            <version>444</version>
-        </dependency>
-    </dependencies>
+    <modules>
+        <module>baseBA</module>
+        <module>baseBB</module>
+    </modules>
 
-    <build>
-        <pluginManagement>
-            <plugins>
-                <plugin>
-                    <groupId>grp</groupId>
-                    <artifactId>baseAB</artifactId>
-                    <version>9.1-SNAPSHOT</version>
-                </plugin>
-            </plugins>
-        </pluginManagement>
-    </build>
 </project>

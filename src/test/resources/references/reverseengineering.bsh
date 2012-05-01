@@ -1,16 +1,19 @@
 base = load("", "1.2");
-
 baseA = load("baseA", "1.2");
-baseA.updateParent(base);
+baseB = load("baseB", "1.2");
+baseBA = load("baseB/baseBA", "1.2");
+baseBB = load("baseB/baseBB", "1.2");
+baseC = load("baseC", "1.2");
 
-baseAA = load("baseA/baseAA", "9.1-SNAPSHOT");
-baseAA.updateParent(baseA);
+baseA.parentVersion(base);
+baseA.updateDependency(baseBA);
 
-baseAB = load("baseA/baseAB", "9.1-SNAPSHOT");
-baseAB.updateParent(baseA);
+baseB.parentVersion(base);
 
-baseB = load("baseB", "9.1-SNAPSHOT");
-baseB.updateParent(base);
-baseB.updateDependency(baseAA);
-baseB.updatePluginDependency(baseAB);
+baseBA.parentVersion(baseB);
+
+baseBB.parentVersion(baseB);
+
+baseC.parentVersion(base);
+baseC.updatePluginDependency(baseBB);
 

@@ -3,21 +3,14 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>commonsconfigtest</groupId>
-    <artifactId>baseA</artifactId>
+    <artifactId>baseBB</artifactId>
     <version>1.2</version>
     <packaging>jar</packaging>
 
     <parent>
       <groupId>commonsconfigtest</groupId>
-      <artifactId>base</artifactId>
+      <artifactId>baseB</artifactId>
       <version>1.2</version>
     </parent>
 
-    <dependencies>
-      <dependency>
-	<groupId>commonsconfigtest</groupId>
-	<artifactId>baseBA</artifactId>
-	<version>1.7</version>
-      </dependency>
-    </dependencies>
 </project>

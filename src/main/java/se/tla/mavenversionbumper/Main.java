@@ -20,7 +20,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -293,8 +292,12 @@ public class Main {
             module.consider(modules);
         }
 
-        for (ReverseEngineeringModule module : new TreeSet<ReverseEngineeringModule>(modules)) {
-            builder.append(module.toString());
+        TreeSet<ReverseEngineeringModule> sortedModules = new TreeSet<ReverseEngineeringModule>(modules);
+        for (ReverseEngineeringModule module : sortedModules) {
+            builder.append(module.getLoadStatement());
+        }
+        for (ReverseEngineeringModule module : sortedModules) {
+            builder.append(module.getDependencyStatements());
         }
 
         FileUtils.write(scenarioFile, builder.toString(), "ISO-8859-1");
