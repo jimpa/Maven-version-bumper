@@ -3,20 +3,13 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>commonsconfigtest</groupId>
-    <artifactId>baseB</artifactId>
-    <version>1.2</version>
-    <packaging>pom</packaging>
+    <artifactId>baseBC</artifactId>
+    <packaging>jar</packaging>
 
     <parent>
       <groupId>commonsconfigtest</groupId>
-      <artifactId>base</artifactId>
+      <artifactId>baseB</artifactId>
       <version>1.2</version>
     </parent>
-
-    <modules>
-        <module>baseBA</module>
-        <module>baseBB</module>
-        <module>baseBC</module>
-    </modules>
 
 </project>

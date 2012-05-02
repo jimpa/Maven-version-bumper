@@ -3,6 +3,7 @@ baseA = load("baseA", "1.2");
 baseB = load("baseB", "1.2");
 baseBA = load("baseB/baseBA", "1.2");
 baseBB = load("baseB/baseBB", "1.2");
+baseBC = load("baseB/baseBC");
 baseC = load("baseC", "1.2");
 
 baseA.parentVersion(base);
@@ -13,6 +14,8 @@ baseB.parentVersion(base);
 baseBA.parentVersion(baseB);
 
 baseBB.parentVersion(baseB);
+
+baseBC.parentVersion(baseB);
 
 baseC.parentVersion(base);
 baseC.updatePluginDependency(baseBB);

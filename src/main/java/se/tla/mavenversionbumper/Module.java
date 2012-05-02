@@ -41,7 +41,7 @@ public class Module {
     final protected Element root;
     final protected Namespace nameSpace;
     final protected String moduleName;
-    final private String originalVersion;
+    protected final String originalVersion;
     private String label;
     private String commitMessage;
     private boolean labelOnlyPomXml = false;
@@ -68,12 +68,13 @@ public class Module {
         document = builder.build(pomFile);
         root = document.getRootElement();
         nameSpace = root.getNamespace();
-        originalVersion = version();
+        Element version = root.getChild("version", nameSpace);
+        if (version != null) {
+            originalVersion = version.getText();
+        } else {
+            originalVersion = null;
+        }
     }
-
-//    public Module(File baseDir) throws JDOMException, IOException {
-//        this(baseDir.getAbsolutePath(), null);
-//    }
 
     /**
      * Constructor used only by the sub class ReadonlyModule to satisfy the compiler. Should never be used.
@@ -137,6 +138,9 @@ public class Module {
      * @param version New Version.
      */
     public void version(String version) {
+        if (originalVersion == null) {
+            throw new IllegalStateException("Modules version can't be updated since it has no version of its own.");
+        }
         if (commitMessage == null) {
             commitMessage = "Bump " + originalVersion + " -> " + version;
         }
@@ -190,9 +194,9 @@ public class Module {
     }
 
     private String myOrParent(String itemName) {
-        String item = root.getChildText(itemName, nameSpace);
-        if (item != null) {
-            return item;
+        String itemValue = root.getChildText(itemName, nameSpace);
+        if (itemValue != null) {
+            return itemValue;
         }
         Element parent = root.getChild("parent", nameSpace);
         if (parent == null) {

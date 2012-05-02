@@ -102,14 +102,17 @@ public class ReverseEngineeringModule extends Module implements Comparable<Rever
     }
 
     public void consider(List<ReverseEngineeringModule> modules) {
-
         parent = detectParent(modules);
         dependencies = findDependencies(modules);
         pluginDependencies = findPluginDependencies(modules);
     }
 
     public String getLoadStatement() {
-        return moduleName() + " = load(\"" + path() + "\", \"" + version() + "\");\n";
+        if (version() != null) {
+            return moduleName() + " = load(\"" + path() + "\", \"" + version() + "\");\n";
+        } else {
+            return moduleName() + " = load(\"" + path() + "\");\n";
+        }
     }
 
     public String getDependencyStatements() {
@@ -126,6 +129,14 @@ public class ReverseEngineeringModule extends Module implements Comparable<Rever
         builder.append("\n");
 
         return builder.toString();
+    }
+
+    /**
+     * @return The original version of this module, or null if none was defined in the pom.xml.
+     */
+    @Override
+    public String version() {
+        return originalVersion;
     }
 
     @Override
