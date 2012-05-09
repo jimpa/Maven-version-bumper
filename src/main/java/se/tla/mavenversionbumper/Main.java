@@ -32,6 +32,11 @@ import joptsimple.OptionParser;
 import joptsimple.OptionSet;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.input.AutoCloseInputStream;
+import org.apache.log4j.BasicConfigurator;
+import org.apache.log4j.ConsoleAppender;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
+import org.apache.log4j.PatternLayout;
 import org.jdom.JDOMException;
 
 import se.tla.mavenversionbumper.vcs.AbstractVersionControl;
@@ -47,6 +52,10 @@ import bsh.Interpreter;
  */
 public class Main {
 
+    private static final Logger logger = Logger.getLogger(Main.class);
+
+    private static final ConsoleAppender loggappender = new ConsoleAppender(new PatternLayout("%c - %m%n"));
+
     private static final List<Module> modulesLoadedForUpdate = new LinkedList<Module>();
 
     private static String baseDirName;
@@ -61,7 +70,8 @@ public class Main {
     }
 
     enum Option {
-        DRYRUN("Dry run. Don't modify anything, only validate configuration.", "d", "dry-run"),
+        VERBOSE("Verbose. Give a description of what changes is actually perfomed.", "v", "verbose"),
+        DRYRUN("Dry run. Don't modify anything, only validate configuration. Implies verbose.", "d", "dry-run"),
         REVERT("Revert any uncommited changes.", "r", "revert"),
         PREPARETEST("Prepare module(s) for a test build.", "p", "prepare-test-build"),
         WARNOFSNAPSHOTS("Searches for any SNAPSHOT dependencies and warns about them. Works great with --dry-run.", "w", "warn-snapshots"),
@@ -97,6 +107,7 @@ public class Main {
 
         OptionParser parser = new OptionParser() {
             {
+                acceptsAll(Option.VERBOSE.getAliases(), Option.VERBOSE.getHelpText());
                 acceptsAll(Option.DRYRUN.getAliases(), Option.DRYRUN.getHelpText());
                 acceptsAll(Option.PREPARETEST.getAliases(), Option.PREPARETEST.getHelpText());
                 acceptsAll(Option.REVERT.getAliases(), Option.REVERT.getHelpText());
@@ -124,6 +135,13 @@ public class Main {
             System.exit(0);
         }
 
+        if (Option.VERBOSE.presentIn(options) || Option.DRYRUN.presentIn(options)) {
+            loggappender.setThreshold(Level.INFO);
+        } else {
+            loggappender.setThreshold(Level.FATAL);
+        }
+        BasicConfigurator.configure(loggappender);
+
         if (countTrues(Option.DRYRUN.presentIn(options),
                 Option.PREPARETEST.presentIn(options),
                 Option.REVERT.presentIn(options),
@@ -135,7 +153,7 @@ public class Main {
         List<String> arguments = options.nonOptionArguments();
 
         if (arguments.size() < 2 || arguments.size() > 3) {
-            System.err.println("Usage: [-d | --dry-run] [-p | --prepare-test-build] [-r | --revert] [--reverse-engineer] [-w | --warn-snapshot] [-h | --help] <base directory> <scenarioFile> [<VC properties file>]");
+            System.err.println("Usage: [-v | --verbose] [-d | --dry-run] [-p | --prepare-test-build] [-r | --revert] [--reverse-engineer] [-w | --warn-snapshot] [-h | --help] <base directory> <scenarioFile> [<VC properties file>]");
             System.exit(1);
         }
 
@@ -317,15 +335,10 @@ public class Main {
         Module m = new Module(baseDirName, moduleDirectoryName);
 
         if (newVersion != null) {
-            System.out.println("ORG: " + m.gav());
             m.version(newVersion);
         }
         if (label != null) {
             m.label(label);
-        }
-
-        if (newVersion != null) {
-            System.out.println("NEW: " + m.gav() + (label != null ? " (" + label + ")" : ""));
         }
 
         modulesLoadedForUpdate.add(m);

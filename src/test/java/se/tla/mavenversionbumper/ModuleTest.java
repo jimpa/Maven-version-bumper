@@ -109,18 +109,6 @@ public class ModuleTest {
     }
 
     @Test
-    public void testSimpleSave() throws Exception {
-        ModuleTestTemplate.template("simple", "simple.xml", new ModuleTinker() {
-            @Override
-            public void tink(Module subject) {
-                subject.groupId("se.tla");
-                subject.artifactId("kaffekokare");
-                subject.version("1.0");
-            }
-        });
-    }
-
-    @Test
     public void testUpdateDependency() throws Exception {
         final Module depmod = new Module("target/test-classes", "simple");
         ModuleTestTemplate.template("dependency", "dependency.xml", new ModuleTinker() {

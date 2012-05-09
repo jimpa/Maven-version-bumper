@@ -22,6 +22,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.log4j.Logger;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.JDOMException;
@@ -35,6 +36,9 @@ import org.jdom.output.XMLOutputter;
  * It contains methods to easily view and manipulate dependency information.
  */
 public class Module {
+
+    private final Logger logger;
+
     private static final String SNAPSHOTPATTERN = "-SNAPSHOT";
     final private Document document;
     final private File pomFile;
@@ -74,6 +78,7 @@ public class Module {
         } else {
             originalVersion = null;
         }
+        logger = Logger.getLogger("Updated " + ga());
     }
 
     /**
@@ -86,6 +91,7 @@ public class Module {
         nameSpace = null;
         moduleName = null;
         originalVersion = null;
+        logger = null;
     }
 
     private File openDir(File base, String name) {
@@ -108,26 +114,19 @@ public class Module {
         return groupId() + ":" + artifactId() + ":" + version();
     }
 
+    /**
+     * @return GA-coordinates. GroupId, ArtifactId.
+     */
+    public String ga() {
+        return groupId() + ":" + artifactId();
+    }
+
     public String groupId() {
         return myOrParent("groupId");
     }
 
-    /**
-     * @param groupId New GroupId.
-     */
-    public void groupId(@SuppressWarnings("SameParameterValue") String groupId) {
-        root.getChild("groupId", nameSpace).setText(groupId);
-    }
-
     public String artifactId() {
         return root.getChildText("artifactId", nameSpace);
-    }
-
-    /**
-     * @param artifactId New ArtifactId.
-     */
-    public void artifactId(@SuppressWarnings("SameParameterValue") String artifactId) {
-        root.getChild("artifactId", nameSpace).setText(artifactId);
     }
 
     public String version() {
@@ -135,16 +134,21 @@ public class Module {
     }
 
     /**
-     * @param version New Version.
+     * @param newVersion New Version.
      */
-    public void version(String version) {
+    public void version(String newVersion) {
         if (originalVersion == null) {
             throw new IllegalStateException("Modules version can't be updated since it has no version of its own.");
         }
         if (commitMessage == null) {
-            commitMessage = "Bump " + originalVersion + " -> " + version;
+            commitMessage = "Bump " + originalVersion + " -> " + newVersion;
         }
-        root.getChild("version", nameSpace).setText(version);
+        Element versionElement = root.getChild("version", nameSpace);
+        String existingVersion = versionElement.getText();
+        if (! existingVersion.equals(newVersion)) {
+            logger.info("version: " + existingVersion + " -> " + newVersion);
+            versionElement.setText(newVersion);
+        }
     }
 
     public String parentVersion() {
@@ -156,18 +160,23 @@ public class Module {
     }
 
     /**
-     * @param parentVersion New parentVersion.
+     * @param newParentVersion New parentVersion.
      */
-    public void parentVersion(String parentVersion) {
+    public void parentVersion(String newParentVersion) {
         Element parent = root.getChild("parent", nameSpace);
         if (parent == null) {
-            throw new IllegalArgumentException("No parent defined in module");
+            throw new IllegalArgumentException("No parent defined in module " + ga());
         }
         Element version = parent.getChild("version", nameSpace);
         if (version == null) {
-            throw new IllegalStateException("No version defined for parent.");
+            throw new IllegalStateException("No version defined for parent in module " + ga());
         }
-        version.setText(parentVersion);
+
+        String existingParentVersion = version.getText();
+        if (! newParentVersion.equals(existingParentVersion)) {
+            logger.info("parent version: " + existingParentVersion + " -> " + newParentVersion);
+            version.setText(newParentVersion);
+        }
     }
 
     /**
@@ -178,19 +187,25 @@ public class Module {
     public void parentVersion(Module newParent) {
         Element existingParent = root.getChild("parent", nameSpace);
         if (existingParent == null) {
-            throw new IllegalArgumentException("No parent in module " + gav() + ". Can't update version.");
+            throw new IllegalArgumentException("No parent in module " + ga() + ". Can't update version.");
         }
         String existingGroupId = existingParent.getChild("groupId", nameSpace).getText();
         String existingArtifactId = existingParent.getChild("artifactId", nameSpace).getText();
         if ((! newParent.groupId().equals(existingGroupId)) || (! newParent.artifactId().equals(existingArtifactId))) {
-            throw new IllegalArgumentException("No such parent in " + gav() + ": " + newParent.gav());
+            throw new IllegalArgumentException("No such parent in " + ga() + ": " + newParent.ga());
         }
 
         Element version = existingParent.getChild("version", nameSpace);
         if (version == null) {
             throw new IllegalStateException("No version defined for parent.");
         }
-        version.setText(newParent.version());
+
+        String existingParentVersion = version.getText();
+        String newParentVersion = newParent.version();
+        if (! newParentVersion.equals(existingParentVersion)) {
+            logger.info("parent version: " + existingParentVersion + " -> " + newParentVersion);
+            version.setText(newParentVersion);
+        }
     }
 
     private String myOrParent(String itemName) {
@@ -224,12 +239,12 @@ public class Module {
         }
 
         if (dep == null) {
-            throw new IllegalArgumentException("No such dependency found in " + gav() + ": " + moduleToUpdate.gav());
+            throw new IllegalArgumentException("No such dependency found in " + ga() + ": " + moduleToUpdate.ga());
         }
 
         Element version = dep.getChild("version", nameSpace);
         if (version == null) {
-            throw new IllegalArgumentException("In " + gav() + ", no version defined for " + moduleToUpdate.gav() +
+            throw new IllegalArgumentException("In " + ga() + ", no version defined for " + moduleToUpdate.ga() +
             ". Probably defined elsewhere in a dependencyManagement.");
         }
 
@@ -241,7 +256,11 @@ public class Module {
             return;
         }
 
-        version.setText(moduleToUpdate.version());
+        String existingVersion = version.getText();
+        if (! existingVersion.equals(moduleToUpdate.version())) {
+            logger.info("update dependency version " + moduleToUpdate.ga() + ": " + existingVersion + " -> " + moduleToUpdate.version());
+            version.setText(moduleToUpdate.version());
+        }
     }
 
     /**
@@ -261,12 +280,12 @@ public class Module {
         }
 
         if (dep == null) {
-            throw new IllegalArgumentException("No such plugin dependency found in " + gav() + ": " + pluginToUpdate.gav());
+            throw new IllegalArgumentException("No such plugin dependency found in " + ga() + ": " + pluginToUpdate.ga());
         }
 
         Element version = dep.getChild("version", nameSpace);
         if (version == null) {
-            throw new IllegalArgumentException("In " + gav() + ", no version defined for " + pluginToUpdate.gav() +
+            throw new IllegalArgumentException("In " + ga() + ", no version defined for " + pluginToUpdate.ga() +
                     ". Probably defined elsewhere in a pluginManagement.");
         }
 
@@ -278,7 +297,11 @@ public class Module {
             return;
         }
 
-        version.setText(pluginToUpdate.version());
+        String existingVersion = version.getText();
+        if (! existingVersion.equals(pluginToUpdate.version())) {
+            logger.info("update plugin dependency version " + pluginToUpdate.ga() + ": " + existingVersion + " -> " + pluginToUpdate.version());
+            version.setText(pluginToUpdate.version());
+        }
     }
 
     /**
@@ -291,15 +314,19 @@ public class Module {
     public void updateProperty(String propertyName, String value) {
         Element properties = root.getChild("properties", nameSpace);
         if (properties == null) {
-            throw new IllegalArgumentException("No properties defined in module " + gav());
+            throw new IllegalArgumentException("No properties defined in module " + ga());
         }
 
         Element property = properties.getChild(propertyName, nameSpace);
         if (property == null) {
-            throw new IllegalArgumentException("No property " + propertyName + " defined in module " + gav());
+            throw new IllegalArgumentException("No property " + propertyName + " defined in module " + ga());
         }
 
-        property.setText(value);
+        String existingProperty = property.getText();
+        if (! existingProperty.equals(value)) {
+            logger.info("update property " + propertyName + ": " + existingProperty + " -> " + value);
+            property.setText(value);
+        }
     }
 
     /**
@@ -324,6 +351,7 @@ public class Module {
      * @param label Label.
      */
     public void label(String label) {
+        logger.info("label: " + label);
         this.label = label;
     }
 
@@ -338,6 +366,7 @@ public class Module {
      * @param commitMessage Custom message to use during a commit.
      */
     public void commitMessage(String commitMessage) {
+        logger.info("commit message " + commitMessage);
         this.commitMessage = commitMessage;
     }
 
@@ -447,6 +476,7 @@ public class Module {
      * @param labelOnlyPomXml If false (default) label whole Module recursively, if true only label the pom.xml.
      */
     public void labelOnlyPomXml(boolean labelOnlyPomXml) {
+        logger.info("label only pom.xml");
         this.labelOnlyPomXml = labelOnlyPomXml;
     }
 

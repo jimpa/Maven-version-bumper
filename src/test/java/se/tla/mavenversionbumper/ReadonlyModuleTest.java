@@ -56,6 +56,7 @@ public class ReadonlyModuleTest {
             if ("groupId".equals(name) ||
                 "artifactId".equals(name) ||
                 "version".equals(name) ||
+                "ga".equals(name) ||
                 "gav".equals(name) ||
                 "wait".equals(name) ||
                 "equals".equals(name) ||

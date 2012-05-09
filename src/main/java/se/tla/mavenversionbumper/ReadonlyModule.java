@@ -51,18 +51,8 @@ public class ReadonlyModule extends Module {
     }
 
     @Override
-    public void groupId(String groupId) {
-        throw new UnsupportedOperationException("No supported in readonly modules");
-    }
-
-    @Override
     public String artifactId() {
         return artifactId;
-    }
-
-    @Override
-    public void artifactId(String artifactId) {
-        throw new UnsupportedOperationException("No supported in readonly modules");
     }
 
     @Override
@@ -71,7 +61,7 @@ public class ReadonlyModule extends Module {
     }
 
     @Override
-    public void version(String version) {
+    public void version(String newVersion) {
         throw new UnsupportedOperationException("No supported in readonly modules");
     }
 
@@ -81,7 +71,7 @@ public class ReadonlyModule extends Module {
     }
 
     @Override
-    public void parentVersion(String parentVersion) {
+    public void parentVersion(String newParentVersion) {
         throw new UnsupportedOperationException("No supported in readonly modules");
     }
 
