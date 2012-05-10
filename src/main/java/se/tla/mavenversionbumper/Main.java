@@ -35,7 +35,6 @@ import org.apache.commons.io.input.AutoCloseInputStream;
 import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.ConsoleAppender;
 import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
 import org.apache.log4j.PatternLayout;
 import org.jdom.JDOMException;
 
@@ -51,8 +50,6 @@ import bsh.Interpreter;
  * Command line interface for the version bumper.
  */
 public class Main {
-
-    private static final Logger logger = Logger.getLogger(Main.class);
 
     private static final ConsoleAppender loggappender = new ConsoleAppender(new PatternLayout("%c - %m%n"));
 
