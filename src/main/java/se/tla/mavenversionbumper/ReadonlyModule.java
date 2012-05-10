@@ -31,7 +31,7 @@ public class ReadonlyModule extends Module {
     private final String version;
 
     public ReadonlyModule(@SuppressWarnings("UnusedParameters") String baseDirName, @SuppressWarnings("UnusedParameters") String moduleName) {
-        throw new UnsupportedOperationException("No supported in readonly modules");
+        throw new UnsupportedOperationException("Not supported in readonly modules");
     }
 
     public ReadonlyModule(String groupId, String artifactId, String version) {
@@ -62,82 +62,82 @@ public class ReadonlyModule extends Module {
 
     @Override
     public void version(String newVersion) {
-        throw new UnsupportedOperationException("No supported in readonly modules");
+        throw new UnsupportedOperationException("Not supported in readonly modules");
     }
 
     @Override
     public String parentVersion() {
-        throw new UnsupportedOperationException("No supported in readonly modules");
+        throw new UnsupportedOperationException("Not supported in readonly modules");
     }
 
     @Override
     public void parentVersion(String newParentVersion) {
-        throw new UnsupportedOperationException("No supported in readonly modules");
+        throw new UnsupportedOperationException("Not supported in readonly modules");
     }
 
     @Override
     public void parentVersion(Module newParent) {
-        throw new UnsupportedOperationException("No supported in readonly modules");
+        throw new UnsupportedOperationException("Not supported in readonly modules");
     }
 
     @Override
     public void updateDependency(Module moduleToUpdate) {
-        throw new UnsupportedOperationException("No supported in readonly modules");
+        throw new UnsupportedOperationException("Not supported in readonly modules");
     }
 
     @Override
     public void updatePluginDependency(Module pluginToUpdate) {
-        throw new UnsupportedOperationException("No supported in readonly modules");
+        throw new UnsupportedOperationException("Not supported in readonly modules");
     }
 
     @Override
     public void updateProperty(String propertyName, String value) {
-        throw new UnsupportedOperationException("No supported in readonly modules");
+        throw new UnsupportedOperationException("Not supported in readonly modules");
     }
 
     @Override
     public void save() throws IOException {
-        throw new UnsupportedOperationException("No supported in readonly modules");
+        throw new UnsupportedOperationException("Not supported in readonly modules");
     }
 
     @Override
     public void label(String label) {
-        throw new UnsupportedOperationException("No supported in readonly modules");
+        throw new UnsupportedOperationException("Not supported in readonly modules");
     }
 
     @Override
     public String label() {
-        throw new UnsupportedOperationException("No supported in readonly modules");
+        throw new UnsupportedOperationException("Not supported in readonly modules");
     }
 
     @Override
     public void commitMessage(String commitMessage) {
-        throw new UnsupportedOperationException("No supported in readonly modules");
+        throw new UnsupportedOperationException("Not supported in readonly modules");
     }
 
     @Override
     public String commitMessage() {
-        throw new UnsupportedOperationException("No supported in readonly modules");
+        throw new UnsupportedOperationException("Not supported in readonly modules");
     }
 
     @Override
     public List<String> findSnapshots() {
-        throw new UnsupportedOperationException("No supported in readonly modules");
+        throw new UnsupportedOperationException("Not supported in readonly modules");
     }
 
     @Override
     public void labelOnlyPomXml(boolean labelOnlyPomXml) {
-        throw new UnsupportedOperationException("No supported in readonly modules");
+        throw new UnsupportedOperationException("Not supported in readonly modules");
     }
 
     @Override
     public boolean labelOnlyPomXml() {
-        throw new UnsupportedOperationException("No supported in readonly modules");
+        throw new UnsupportedOperationException("Not supported in readonly modules");
     }
 
     @Override
     public File pomFile() {
-        throw new UnsupportedOperationException("No supported in readonly modules");
+        throw new UnsupportedOperationException("Not supported in readonly modules");
     }
 
     @Override
