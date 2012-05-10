@@ -68,3 +68,5 @@ Release Notes
   Added generation of suggestion of Clearcase Config Spec with all the created labels.
 
   Rewrote the reverse engineering mode to make it more resilient. Added better testing of it.
+
+  Removed all default logging and added an verbose option to enable logging of all actual changes done in a scenario.
