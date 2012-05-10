@@ -40,11 +40,11 @@ public class Module {
     private final Logger logger;
 
     private static final String SNAPSHOTPATTERN = "-SNAPSHOT";
-    final private Document document;
-    final private File pomFile;
-    final protected Element root;
-    final protected Namespace nameSpace;
-    final protected String moduleName;
+    private final Document document;
+    private final File pomFile;
+    protected final Element root;
+    protected final Namespace nameSpace;
+    protected final String moduleName;
     protected final String originalVersion;
     private String label;
     private String commitMessage;
