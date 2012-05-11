@@ -70,3 +70,5 @@ Release Notes
   Rewrote the reverse engineering mode to make it more resilient. Added better testing of it.
 
   Removed all default logging and added an verbose option to enable logging of all actual changes done in a scenario.
+
+  Added possibility to include additional scenario files in the same run by use of the builtin source("...") function.

@@ -54,8 +54,10 @@ public class Main {
     private static final ConsoleAppender loggappender = new ConsoleAppender(new PatternLayout("%c - %m%n"));
 
     private static final List<Module> modulesLoadedForUpdate = new LinkedList<Module>();
+    private static final Interpreter interpreter = new Interpreter();
 
     private static String baseDirName;
+    private static File scenarioFile;
     private static VersionControl versionControl = new NoopVersionControl();
     private static final Map<String, Class<? extends VersionControl>> versionControllers;
 
@@ -178,7 +180,7 @@ public class Main {
                 System.exit(1);
             }
         }
-        File scenarioFile = new File(scenarioFileName);
+        scenarioFile = new File(scenarioFileName);
 
         if (Option.REVERSEENGINEER.presentIn(options)) {
             if (scenarioFile.exists()) {
@@ -227,17 +229,17 @@ public class Main {
 
         try {
             String scenario = FileUtils.readFileToString(scenarioFile);
-            Interpreter i = new Interpreter();
-            i.eval("importCommands(\"se.tla.mavenversionbumper.commands\")");
-            i.eval("import se.tla.mavenversionbumper.Main");
-            i.eval("import se.tla.mavenversionbumper.Module");
-            i.eval("import se.tla.mavenversionbumper.ReadonlyModule");
-            i.eval("baseDir = \"" + baseDirName + "\"");
-            i.eval("load(String moduleName) { return Main.load(moduleName, null, null); }");
-            i.eval("load(String moduleName, String newVersion) { return Main.load(moduleName, newVersion, null); }");
-            i.eval("load(String moduleName, String newVersion, String label) { return Main.load(moduleName, newVersion, label); }");
-            i.eval("loadReadOnly(String groupId, String artifactId, String version) { return new ReadonlyModule(groupId, artifactId, version); }");
-            i.eval(scenario);
+            interpreter.eval("importCommands(\"se.tla.mavenversionbumper.commands\")");
+            interpreter.eval("import se.tla.mavenversionbumper.Main");
+            interpreter.eval("import se.tla.mavenversionbumper.Module");
+            interpreter.eval("import se.tla.mavenversionbumper.ReadonlyModule");
+            interpreter.eval("baseDir = \"" + baseDirName + "\"");
+            interpreter.eval("source(String fileName) { return Main.source(fileName); }");
+            interpreter.eval("load(String moduleName) { return Main.load(moduleName, null, null); }");
+            interpreter.eval("load(String moduleName, String newVersion) { return Main.load(moduleName, newVersion, null); }");
+            interpreter.eval("load(String moduleName, String newVersion, String label) { return Main.load(moduleName, newVersion, label); }");
+            interpreter.eval("loadReadOnly(String groupId, String artifactId, String version) { return new ReadonlyModule(groupId, artifactId, version); }");
+            interpreter.source(scenarioFile.getAbsolutePath());
 
             if (Option.WARNOFSNAPSHOTS.presentIn(options)) {
                 for (Module module : modulesLoadedForUpdate) {
@@ -341,5 +343,23 @@ public class Main {
         modulesLoadedForUpdate.add(m);
 
         return m;
+    }
+
+    /**
+     * Include an additional scenario file.
+     *
+     * @param newScenarioFileName Scenario file to include.
+     * @throws IOException If the new scenario file could't be read.
+     * @throws EvalError   If the new scenario file could't be parsed.
+     */
+    public static void source(String newScenarioFileName) throws IOException, EvalError {
+        File newScenarioFile = new File(newScenarioFileName);
+        if (newScenarioFile.isFile() || newScenarioFile.canRead()) {
+            interpreter.source(newScenarioFileName);
+        } else {
+            File scenarioParent = scenarioFile.getParentFile();
+            newScenarioFile = new File(scenarioParent, newScenarioFileName);
+            interpreter.source(newScenarioFile.getAbsolutePath());
+        }
     }
 }
