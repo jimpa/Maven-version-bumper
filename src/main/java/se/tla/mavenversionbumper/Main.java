@@ -42,6 +42,7 @@ import se.tla.mavenversionbumper.vcs.AbstractVersionControl;
 import se.tla.mavenversionbumper.vcs.Clearcase;
 import se.tla.mavenversionbumper.vcs.Git;
 import se.tla.mavenversionbumper.vcs.NoopVersionControl;
+import se.tla.mavenversionbumper.vcs.Subversion;
 import se.tla.mavenversionbumper.vcs.VersionControl;
 import bsh.EvalError;
 import bsh.Interpreter;
@@ -63,13 +64,13 @@ public class Main {
 
     static {
         versionControllers = new HashMap<String, Class<? extends VersionControl>>();
-        // Only lower case names.
-        versionControllers.put("git", Git.class);
-        versionControllers.put("clearcase", Clearcase.class);
+        versionControllers.put(Git.ACRONYM.toLowerCase(), Git.class);
+        versionControllers.put(Clearcase.ACRONYM.toLowerCase(), Clearcase.class);
+        versionControllers.put(Subversion.ACRONYM.toLowerCase(), Subversion.class);
     }
 
     enum Option {
-        VERBOSE("Verbose. Give a description of what changes is actually perfomed.", "v", "verbose"),
+        VERBOSE("Verbose. Give a description of what changes is actually performed.", "v", "verbose"),
         DRYRUN("Dry run. Don't modify anything, only validate configuration. Implies verbose.", "d", "dry-run"),
         REVERT("Revert any uncommited changes.", "r", "revert"),
         PREPARETEST("Prepare module(s) for a test build.", "p", "prepare-test-build"),

@@ -9,5 +9,4 @@ to be fixed for it to be the tool that the author envisioned it to be.
   The need for this is mostly centered around the version control operations.
 
 2 - More version control systems needs to be implemented.
-  * Subversion
-  * CVS (?)
+  * CVS

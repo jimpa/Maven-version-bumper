@@ -19,6 +19,7 @@ import se.tla.mavenversionbumper.Module;
  * Requires access to the command line interface cleartool.
  */
 public class Clearcase extends AbstractVersionControl {
+    public static final String ACRONYM = "clearcase";
 
     private static final String COMMANDPATH = "cleartool.path";
     private static final String COMMANDPATHDEFAULT = "cleartool";

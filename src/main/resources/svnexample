@@ -1,0 +1,7 @@
+versioncontrol=svn
+#
+# If the svn command isn't part of your PATH, you can specify its location with this property.
+# svn.path=svn
+
+# From the repository root, what is the path to the tags directory. Default is "tags".
+# svn.tagsbase=tags

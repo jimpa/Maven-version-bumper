@@ -31,6 +31,7 @@ import java.util.Properties;
  * Requires access to the command line interface git.
  */
 public class Git extends AbstractVersionControl {
+    public static final String ACRONYM = "git";
 
     private static final String COMMANDPATH = "git.path";
     private static final String COMMANDPATHDEFAULT = "git";

@@ -22,7 +22,9 @@ import java.util.List;
 
 import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.DefaultExecutor;
+import org.apache.commons.exec.ExecuteStreamHandler;
 import org.apache.commons.exec.ExecuteWatchdog;
+import org.apache.commons.exec.Executor;
 import se.tla.mavenversionbumper.Module;
 
 /**
@@ -33,6 +35,8 @@ public abstract class AbstractVersionControl implements VersionControl {
 
     public static final String VERSIONCONTROL = "versioncontrol";
     private static final int DEFAULTTIMEOUT = 60000;
+
+    private Executor executor = new DefaultExecutor();
 
     /**
      * {@inheritDoc}
@@ -66,20 +70,42 @@ public abstract class AbstractVersionControl implements VersionControl {
      * @param timeout Time out in ms. If -1, don't set any time out.
      */
     protected void execute(CommandLine cmdLine, File workDir, int timeout) {
-        DefaultExecutor exec = new DefaultExecutor();
+        execute(cmdLine, workDir,  timeout, null);
+    }
+
+    /**
+     * Execute this command line, optionally in this working directory.
+     * @param cmdLine Command line to execute.
+     * @param workDir Working directory to set before execution, or null if process default working directory should be used.
+     * @param timeout Time out in ms. If -1, don't set any time out.
+     * @param executeStreamHandler Special stream handler to use, or null for use of the default.
+     */
+    protected void execute(CommandLine cmdLine, File workDir, int timeout, ExecuteStreamHandler executeStreamHandler) {
+
         if (timeout != -1) {
-            exec.setWatchdog(new ExecuteWatchdog(timeout));
+            executor.setWatchdog(new ExecuteWatchdog(timeout));
         }
         if (workDir != null) {
-            exec.setWorkingDirectory(workDir);
+            executor.setWorkingDirectory(workDir);
+        }
+        if (executeStreamHandler != null) {
+            executor.setStreamHandler(executeStreamHandler);
         }
 
         System.out.println("Running command:   " + cmdLine.toString());
 
         try {
-            exec.execute(cmdLine);
+            executor.execute(cmdLine);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public Executor getExecutor() {
+        return executor;
+    }
+
+    public void setExecutor(Executor executor) {
+        this.executor = executor;
     }
 }
