@@ -45,7 +45,7 @@ public class GitTest {
     @Before
     public void before() throws IOException {
         defaultCommandProperties = new Properties();
-        defaultCommandProperties.setProperty(AbstractVersionControl.VERSIONCONTROL, Subversion.ACRONYM);
+        defaultCommandProperties.setProperty(AbstractVersionControl.VERSIONCONTROL, Git.ACRONYM);
         defaultCommandProperties.setProperty(Git.COMMANDPATH, COMMANDPATH);
 
         defaultExecutor = new FakeExecutor();
