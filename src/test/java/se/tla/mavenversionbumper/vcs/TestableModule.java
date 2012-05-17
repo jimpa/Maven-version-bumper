@@ -49,4 +49,9 @@ public class TestableModule extends ReadonlyModule {
     public File pomFile() {
         return pomFile;
     }
+
+    @Override
+    public boolean labelOnlyPomXml() {
+        return false;
+    }
 }
