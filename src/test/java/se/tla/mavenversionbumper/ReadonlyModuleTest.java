@@ -16,12 +16,13 @@
 
 package se.tla.mavenversionbumper;
 
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+
+import static org.junit.Assert.*;
 
 /**
  * Tests of the ReadonlyModule class.
@@ -40,11 +41,11 @@ public class ReadonlyModuleTest {
 
     @Test
     public void testWorkingMethods() {
-        Assert.assertEquals(GROUP_ID, subject.groupId());
-        Assert.assertEquals(ARTIFACT_ID, subject.artifactId());
-        Assert.assertEquals(VERSION, subject.version());
-        Assert.assertEquals(GROUP_ID + ":" + ARTIFACT_ID + ":" + VERSION, subject.gav());
-        Assert.assertEquals(GROUP_ID + ":" + ARTIFACT_ID + ":" + VERSION, subject.toString());
+        assertEquals(GROUP_ID, subject.groupId());
+        assertEquals(ARTIFACT_ID, subject.artifactId());
+        assertEquals(VERSION, subject.version());
+        assertEquals(GROUP_ID + ":" + ARTIFACT_ID + ":" + VERSION, subject.gav());
+        assertEquals(GROUP_ID + ":" + ARTIFACT_ID + ":" + VERSION, subject.toString());
     }
 
     @Test
@@ -84,13 +85,13 @@ public class ReadonlyModuleTest {
                 } else {
                     method.invoke(subject);
                 }
-                Assert.fail();
+                fail();
             } catch (IllegalAccessException e) {
-                Assert.fail(e.getMessage());
+                fail(e.getMessage());
             } catch (InvocationTargetException e) {
                 Throwable t = e.getCause();
                 if (! (t instanceof UnsupportedOperationException)) {
-                    Assert.fail();
+                    fail();
                 }
             }
         }

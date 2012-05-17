@@ -18,9 +18,10 @@ package se.tla.mavenversionbumper;
 
 import org.apache.commons.io.FileUtils;
 import org.custommonkey.xmlunit.Diff;
-import org.junit.Assert;
 
 import java.io.File;
+
+import static org.junit.Assert.*;
 
 /**
  * Helper class to ease the testing of transformation in the Module class.
@@ -58,7 +59,7 @@ class ModuleTestTemplate {
         Diff diff = new Diff(reference, result);
 
         if (! diff.identical()) {
-            Assert.fail(diff.toString());
+            fail(diff.toString());
         }
     }
 }

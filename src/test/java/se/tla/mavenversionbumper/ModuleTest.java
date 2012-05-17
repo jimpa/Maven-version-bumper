@@ -16,10 +16,11 @@
 
 package se.tla.mavenversionbumper;
 
-import org.junit.Assert;
 import org.junit.Test;
 
 import java.util.List;
+
+import static org.junit.Assert.*;
 
 /**
  * Unit tests for the Module class.
@@ -30,36 +31,36 @@ public class ModuleTest {
     public void testSimple() throws Exception {
         Module subject = new Module("target/test-classes/sources", "simple");
 
-        Assert.assertEquals("se.tla.maven", subject.groupId());
-        Assert.assertEquals("versionbumper", subject.artifactId());
-        Assert.assertEquals("1.0-SNAPSHOT", subject.version());
-        Assert.assertEquals("se.tla.maven:versionbumper:1.0-SNAPSHOT", subject.gav());
+        assertEquals("se.tla.maven", subject.groupId());
+        assertEquals("versionbumper", subject.artifactId());
+        assertEquals("1.0-SNAPSHOT", subject.version());
+        assertEquals("se.tla.maven:versionbumper:1.0-SNAPSHOT", subject.gav());
     }
 
     @Test
     public void testParentVersion() throws Exception {
         Module subject = new Module("target/test-classes", "withparent");
 
-        Assert.assertEquals("0.1-SNAPSHOT", subject.parentVersion());
+        assertEquals("0.1-SNAPSHOT", subject.parentVersion());
     }
 
     @Test
     public void testItemsFromParent() throws Exception {
         Module subject = new Module("target/test-classes", "withparent");
 
-        Assert.assertEquals("se.tla.maven", subject.groupId());
-        Assert.assertEquals("0.1-SNAPSHOT", subject.version());
+        assertEquals("se.tla.maven", subject.groupId());
+        assertEquals("0.1-SNAPSHOT", subject.version());
     }
 
     @Test
     public void testParentVersionWithNoParent() throws Exception {
         Module subject = new Module("target/test-classes", "simple");
 
-        Assert.assertNull(subject.parentVersion());
+        assertNull(subject.parentVersion());
 
         try {
             subject.parentVersion("1.0");
-            Assert.fail();
+            fail();
         } catch (IllegalArgumentException e) {
             // Expected
         }
@@ -67,7 +68,7 @@ public class ModuleTest {
         try {
             Module parent = new Module("target/test-classes", "simple");
             subject.parentVersion(parent);
-            Assert.fail();
+            fail();
         } catch (IllegalArgumentException e) {
             // Expected
         }
@@ -79,7 +80,7 @@ public class ModuleTest {
 
         try {
             subject.parentVersion("1.0");
-            Assert.fail();
+            fail();
         } catch (IllegalStateException e) {
             // Expected
         }
@@ -92,7 +93,7 @@ public class ModuleTest {
 
         try {
             subject.parentVersion(parent);
-            Assert.fail();
+            fail();
         } catch (IllegalArgumentException e) {
             // Expected
         }
@@ -171,7 +172,7 @@ public class ModuleTest {
                     subject.updateProperty("tea", "lipton");
                 }
             });
-            Assert.fail();
+            fail();
         } catch (IllegalArgumentException e) {
             // Expected
         }
@@ -209,7 +210,7 @@ public class ModuleTest {
                     subject.updateDependency(depmod);
                 }
             });
-            Assert.fail();
+            fail();
         } catch (IllegalArgumentException e) {
             // Expected
         }
@@ -221,14 +222,14 @@ public class ModuleTest {
 
         List<String> result = subject.findSnapshots();
 
-        Assert.assertEquals(7, result.size());
-        Assert.assertEquals("Module version", result.get(0));
-        Assert.assertEquals("Parent version 2-SNAPSHOT", result.get(1));
-        Assert.assertEquals("Property testVersion:3-SNAPSHOT", result.get(2));
-        Assert.assertEquals("Dependency foo:dependency:4-SNAPSHOT", result.get(3));
-        Assert.assertEquals("Dependency management foo:dependencymanagement:5-SNAPSHOT", result.get(4));
-        Assert.assertEquals("Plugin foo:plugin:6-SNAPSHOT", result.get(5));
-        Assert.assertEquals("Plugin management foo:pluginmanagement:7-SNAPSHOT", result.get(6));
+        assertEquals(7, result.size());
+        assertEquals("Module version", result.get(0));
+        assertEquals("Parent version 2-SNAPSHOT", result.get(1));
+        assertEquals("Property testVersion:3-SNAPSHOT", result.get(2));
+        assertEquals("Dependency foo:dependency:4-SNAPSHOT", result.get(3));
+        assertEquals("Dependency management foo:dependencymanagement:5-SNAPSHOT", result.get(4));
+        assertEquals("Plugin foo:plugin:6-SNAPSHOT", result.get(5));
+        assertEquals("Plugin management foo:pluginmanagement:7-SNAPSHOT", result.get(6));
     }
 
     @Test
@@ -237,6 +238,6 @@ public class ModuleTest {
 
         List<String> result = subject.findSnapshots();
 
-        Assert.assertEquals(0, result.size());
+        assertEquals(0, result.size());
     }
 }

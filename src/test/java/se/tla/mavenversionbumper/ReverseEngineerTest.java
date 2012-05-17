@@ -16,18 +16,16 @@
 
 package se.tla.mavenversionbumper;
 
-import junit.framework.Assert;
 import org.apache.commons.io.FileUtils;
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.List;
 
+import static junit.framework.Assert.*;
+
 /**
- *
+ * Test of the ReverseEngineering class.
  */
 public class ReverseEngineerTest {
 
@@ -43,6 +41,6 @@ public class ReverseEngineerTest {
 
         String result = FileUtils.readFileToString(resultFile);
         String expectedResult = FileUtils.readFileToString(expectedResultFile);
-        Assert.assertEquals(expectedResult, result);
+        assertEquals(expectedResult, result);
     }
 }
