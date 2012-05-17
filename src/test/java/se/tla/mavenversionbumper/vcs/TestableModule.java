@@ -21,7 +21,7 @@ import se.tla.mavenversionbumper.ReadonlyModule;
 import java.io.File;
 
 /**
- *
+ * Subclass of Module used to test implementations of the VersionControl interface.
  */
 public class TestableModule extends ReadonlyModule {
     File pomFile;
