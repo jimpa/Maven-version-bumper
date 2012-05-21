@@ -33,7 +33,7 @@ public class Clearcase extends AbstractVersionControl {
     public Clearcase(Properties controlProperties) {
         String commandProperty = controlProperties.getProperty(COMMANDPATH, COMMANDPATHDEFAULT);
         if (System.getProperty("os.name").toLowerCase().contains("windows") &&
-                commandProperty.toLowerCase().endsWith(".exe")) {
+                ! commandProperty.toLowerCase().endsWith(".exe")) {
             commandProperty += ".exe";
         }
         commandPath = commandProperty;
