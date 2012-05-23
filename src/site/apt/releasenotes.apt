@@ -29,6 +29,8 @@ Release Notes
 
   Subversion support.
 
+  Added option to clearcase to control if checkouts are reserved or not.
+
 * 1.4
   Several bug fixes.
 
