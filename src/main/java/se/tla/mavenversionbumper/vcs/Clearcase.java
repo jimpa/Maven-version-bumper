@@ -25,10 +25,13 @@ public class Clearcase extends AbstractVersionControl {
     private static final String COMMANDPATHDEFAULT = "cleartool";
     protected static final String LABELTIMEOUT = "cleartool.labeltimeout";
     private static final String LABELDEFAULTTIMEOUT = "900000"; // 15 minutes.
+    protected static final String CHECKOUTRESERVED = "cleartool.checkoutreserved";
+    private static final String CHECKOUTRESERVEDDEFAULT = "true";
 
     private final Set<Module> checkedOut = new HashSet<Module>();
     private final String commandPath;
     private final int labelTimeout;
+    private final boolean checkoutReserved;
 
     public Clearcase(Properties controlProperties) {
         String commandProperty = controlProperties.getProperty(COMMANDPATH, COMMANDPATHDEFAULT);
@@ -44,6 +47,9 @@ public class Clearcase extends AbstractVersionControl {
         } catch (NumberFormatException e) {
             throw new IllegalArgumentException("The property " + LABELTIMEOUT + " must be an integer");
         }
+
+        String checkoutReservedProperty = controlProperties.getProperty(CHECKOUTRESERVED, CHECKOUTRESERVEDDEFAULT);
+        this.checkoutReserved = Boolean.parseBoolean(checkoutReservedProperty);
     }
 
     /**
@@ -86,6 +92,11 @@ public class Clearcase extends AbstractVersionControl {
 
             CommandLine cmdLine = new CommandLine(commandPath);
             cmdLine.addArgument("checkout");
+            if (checkoutReserved) {
+                cmdLine.addArgument("-reserved");
+            } else {
+                cmdLine.addArgument("-unreserved");
+            }
             cmdLine.addArgument("-nc");
             cmdLine.addArgument("${file}");
             cmdLine.setSubstitutionMap(map);

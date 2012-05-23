@@ -124,4 +124,46 @@ public class ClearcaseTest {
         assertEquals("\"" + LABEL + "\"", arguments[4]);
         assertEquals(pomFile.getParentFile().getAbsolutePath(), arguments[5]);
     }
+
+    @Test
+    public void testBeforeReserved() {
+        Module module = new TestableModule(pomFile, "foo", "bar", "1", null, LABEL);
+        defaultCommandProperties.setProperty(Clearcase.CHECKOUTRESERVED, "true");
+        defaultSubject = new Clearcase(defaultCommandProperties);
+        defaultSubject.setExecutor(defaultExecutor);
+
+        defaultSubject.before(Arrays.asList(module));
+
+        assertEquals(1, defaultExecutor.commandLines.size());
+        CommandLine commandLine = defaultExecutor.commandLines.get(0);
+        assertEquals(COMMANDPATH, commandLine.getExecutable());
+
+        String[] arguments = commandLine.getArguments();
+        assertEquals(4, arguments.length);
+        assertEquals("checkout", arguments[0]);
+        assertEquals("-reserved", arguments[1]);
+        assertEquals("-nc", arguments[2]);
+        assertEquals(pomFile.getAbsolutePath(), arguments[3]);
+    }
+
+    @Test
+    public void testBeforeUnreserved() {
+        Module module = new TestableModule(pomFile, "foo", "bar", "1", null, LABEL);
+        defaultCommandProperties.setProperty(Clearcase.CHECKOUTRESERVED, "false");
+        defaultSubject = new Clearcase(defaultCommandProperties);
+        defaultSubject.setExecutor(defaultExecutor);
+
+        defaultSubject.before(Arrays.asList(module));
+
+        assertEquals(1, defaultExecutor.commandLines.size());
+        CommandLine commandLine = defaultExecutor.commandLines.get(0);
+        assertEquals(COMMANDPATH, commandLine.getExecutable());
+
+        String[] arguments = commandLine.getArguments();
+        assertEquals(4, arguments.length);
+        assertEquals("checkout", arguments[0]);
+        assertEquals("-unreserved", arguments[1]);
+        assertEquals("-nc", arguments[2]);
+        assertEquals(pomFile.getAbsolutePath(), arguments[3]);
+    }
 }
