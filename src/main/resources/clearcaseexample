@@ -5,3 +5,6 @@ versioncontrol=clearcase
 
 # Default timeout for the label command is 15 minutes.
 #cleartool.labeltimeout=900000
+
+# Should checkouts be reserved or unreserved? Default is reserved.
+# cleartool.checkoutreserved=true
