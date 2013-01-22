@@ -488,6 +488,14 @@ public class Module {
     }
 
     /**
+     * Determines if this instance is writable or read only.
+     * @return True if no changes are allowed and false if changes ARE allowed. This class always returns false.
+     */
+    public boolean isReadOnly() {
+        return false;
+    }
+
+    /**
      * @return The modules pom.xml file.
      */
     public File pomFile() {

@@ -140,6 +140,14 @@ public class ReadonlyModule extends Module {
         throw new UnsupportedOperationException("Not supported in readonly modules");
     }
 
+    /**
+     * Determines if this instance is writable or read only.
+     * @return True if no changes are allowed and false if changes ARE allowed. This class always returns true.
+     */
+    public boolean isReadOnly() {
+        return true;
+    }
+
     @Override
     public String toString() {
         return gav();

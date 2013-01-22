@@ -59,6 +59,7 @@ public class ReadonlyModuleTest {
                 "version".equals(name) ||
                 "ga".equals(name) ||
                 "gav".equals(name) ||
+                "isReadOnly".equals(name) ||
                 "wait".equals(name) ||
                 "equals".equals(name) ||
                 "hashCode".equals(name) ||
