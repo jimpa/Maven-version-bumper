@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
+import java.util.TreeSet;
 
 
 import org.apache.commons.exec.CommandLine;
@@ -170,12 +171,18 @@ public class Clearcase extends AbstractVersionControl {
             }
         }
 
-        // Create label types
+        // Remove duplicate label names.
+        Set<String> labels = new TreeSet<String>();
         for (Module module : modulesToLabel) {
-            mklbtype(module.label());
+            labels.add(module.label());
         }
 
-        // Label
+        // Create label types.
+        for (String label : labels) {
+            mklbtype(label);
+        }
+
+        // Apply the labels to the modules.
         for (Module module : modulesToLabel) {
             if (module.labelOnlyPomXml()) {
                 mklabel(module.label(), false, module.pomFile(), module.pomFile().getParentFile());

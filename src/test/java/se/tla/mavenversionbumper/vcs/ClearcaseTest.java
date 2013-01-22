@@ -126,6 +126,48 @@ public class ClearcaseTest {
     }
 
     @Test
+    public void testMultipleLabels() {
+        Module module1 = new TestableModule(pomFile, "foo", "bar", "1", null, LABEL);
+        Module module2 = new TestableModule(pomFile, "foo", "barf", "1", null, LABEL);
+
+        defaultSubject.label(Arrays.asList(module1, module2));
+
+        assertEquals(3, defaultExecutor.commandLines.size());
+        CommandLine commandLine = defaultExecutor.commandLines.get(0);
+        assertEquals(COMMANDPATH, commandLine.getExecutable());
+
+        String[] arguments = commandLine.getArguments();
+        assertEquals(3, arguments.length);
+        assertEquals("mklbtype", arguments[0]);
+        assertEquals("-nc", arguments[1]);
+        assertEquals("\"" + LABEL + "\"", arguments[2]);
+
+        commandLine = defaultExecutor.commandLines.get(1);
+        assertEquals(COMMANDPATH, commandLine.getExecutable());
+
+        arguments = commandLine.getArguments();
+        assertEquals(6, arguments.length);
+        assertEquals("mklabel", arguments[0]);
+        assertEquals("-recurse", arguments[1]);
+        assertEquals("-replace", arguments[2]);
+        assertEquals("-nc", arguments[3]);
+        assertEquals("\"" + LABEL + "\"", arguments[4]);
+        assertEquals(pomFile.getParentFile().getAbsolutePath(), arguments[5]);
+
+        commandLine = defaultExecutor.commandLines.get(2);
+        assertEquals(COMMANDPATH, commandLine.getExecutable());
+
+        arguments = commandLine.getArguments();
+        assertEquals(6, arguments.length);
+        assertEquals("mklabel", arguments[0]);
+        assertEquals("-recurse", arguments[1]);
+        assertEquals("-replace", arguments[2]);
+        assertEquals("-nc", arguments[3]);
+        assertEquals("\"" + LABEL + "\"", arguments[4]);
+        assertEquals(pomFile.getParentFile().getAbsolutePath(), arguments[5]);
+    }
+
+    @Test
     public void testBeforeReserved() {
         Module module = new TestableModule(pomFile, "foo", "bar", "1", null, LABEL);
         defaultCommandProperties.setProperty(Clearcase.CHECKOUTRESERVED, "true");
