@@ -1,12 +1,11 @@
-Maven-version-bumper
-====================
+# Maven-version-bumper
 
-* Rationale
+##Rationale
 
   The need for this tool comes from a desire to have precise control when bumping versions in large multi-module
   projects where the modules individual version cycles aren't always synchronized.
 
-** The current problem
+### The current problem
 
   There are a number of different Maven plugins (for example releases and versions) that does a fair job
   tackling this problem, but they have a number of shortcomings:
@@ -21,7 +20,7 @@ Maven-version-bumper
 
   This project is an experiment in an other approach of tackling the "Dependency Version Hell" problem.
 
-** Dependency Version Hell
+### Dependency Version Hell
 
   Any fairly large scale project that uses Maven soon finds the need to organize its code in a number of different
   modules. This need comes from the fact different parts of the project needs to be released at different times but
@@ -43,7 +42,7 @@ Maven-version-bumper
   easy, but if you think that it will probably fix itself over time chances are good that you can now welcome
   "Dependency Version Hell" into your life.
 
-** A suggestion to an alternate solution
+### A suggestion to an alternate solution
 
   The existing plugins release and versions have the same goal here, to automate the repetitive work of keeping the
   dependencies under control. It is not the goal that the author objects to, but rather the method of getting there.
@@ -67,7 +66,7 @@ Maven-version-bumper
     * can be used to find any lingering SNAPSHOT dependencies that could possibly indicate forgotten modules.
 
 
-* Scope of the tool
+## Scope of the tool
 
   This tool is a building block in the larger release process in that it tries to create a clear, dense and simple
   syntax, a DSL if you like, for the task of defining what versions that should get updated.
