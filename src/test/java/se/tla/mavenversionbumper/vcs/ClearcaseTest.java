@@ -28,19 +28,21 @@ import java.util.Arrays;
 import java.util.Properties;
 
 import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertFalse;
+import static junit.framework.Assert.fail;
 
 /**
  * Test of the Clearcase class.
  */
 public class ClearcaseTest {
 
-    public static final String COMMANDPATH = "clearcase.exe";
+    public static final String COMMANDPATH = "cleartool.exe";
     Properties defaultCommandProperties;
     Clearcase defaultSubject;
     FakeExecutor defaultExecutor;
     File pomFile;
     static final String COMMIT_MSG = "COMMITED AS ....";
-    static final String LABEL = "TAG, Tag, tag";
+    static final String LABEL = "TAG";
 
     @Before
     public void before() throws IOException {
@@ -58,6 +60,7 @@ public class ClearcaseTest {
 
     @After
     public void after() {
+        //noinspection ResultOfMethodCallIgnored
         pomFile.delete();
     }
 
@@ -110,7 +113,7 @@ public class ClearcaseTest {
         assertEquals(3, arguments.length);
         assertEquals("mklbtype", arguments[0]);
         assertEquals("-nc", arguments[1]);
-        assertEquals("\"" + LABEL + "\"", arguments[2]);
+        assertEquals(LABEL, arguments[2]);
 
         commandLine = defaultExecutor.commandLines.get(1);
         assertEquals(COMMANDPATH, commandLine.getExecutable());
@@ -121,8 +124,26 @@ public class ClearcaseTest {
         assertEquals("-recurse", arguments[1]);
         assertEquals("-replace", arguments[2]);
         assertEquals("-nc", arguments[3]);
-        assertEquals("\"" + LABEL + "\"", arguments[4]);
+        assertEquals(LABEL, arguments[4]);
         assertEquals(pomFile.getParentFile().getAbsolutePath(), arguments[5]);
+    }
+
+    @Test
+    public void testIllegalLabel() {
+        tryIllegalLabel("TAG,");
+        tryIllegalLabel("TAG ");
+        tryIllegalLabel("-TAG");
+        tryIllegalLabel("RäkSmörGås");
+    }
+
+    private void tryIllegalLabel(String label) {
+        Module module = new TestableModule(pomFile, "foo", "bar", "1", null, label);
+        try {
+            defaultSubject.before(Arrays.asList(module));
+            fail("Should not complete without an IllegalArgumentException");
+        } catch (IllegalArgumentException e) {
+            // Expected
+        }
     }
 
     @Test
@@ -140,7 +161,7 @@ public class ClearcaseTest {
         assertEquals(3, arguments.length);
         assertEquals("mklbtype", arguments[0]);
         assertEquals("-nc", arguments[1]);
-        assertEquals("\"" + LABEL + "\"", arguments[2]);
+        assertEquals(LABEL, arguments[2]);
 
         commandLine = defaultExecutor.commandLines.get(1);
         assertEquals(COMMANDPATH, commandLine.getExecutable());
@@ -151,7 +172,7 @@ public class ClearcaseTest {
         assertEquals("-recurse", arguments[1]);
         assertEquals("-replace", arguments[2]);
         assertEquals("-nc", arguments[3]);
-        assertEquals("\"" + LABEL + "\"", arguments[4]);
+        assertEquals(LABEL, arguments[4]);
         assertEquals(pomFile.getParentFile().getAbsolutePath(), arguments[5]);
 
         commandLine = defaultExecutor.commandLines.get(2);
@@ -163,7 +184,7 @@ public class ClearcaseTest {
         assertEquals("-recurse", arguments[1]);
         assertEquals("-replace", arguments[2]);
         assertEquals("-nc", arguments[3]);
-        assertEquals("\"" + LABEL + "\"", arguments[4]);
+        assertEquals(LABEL, arguments[4]);
         assertEquals(pomFile.getParentFile().getAbsolutePath(), arguments[5]);
     }
 
@@ -207,5 +228,17 @@ public class ClearcaseTest {
         assertEquals("-unreserved", arguments[1]);
         assertEquals("-nc", arguments[2]);
         assertEquals(pomFile.getAbsolutePath(), arguments[3]);
+    }
+
+    @Test
+    public void testAfterWithMultipleLabels() {
+        Module module1 = new TestableModule(pomFile, "foo", "bar", "1", null, LABEL);
+        Module module2 = new TestableModule(pomFile, "foo", "barf", "1", null, LABEL);
+
+        String result = defaultSubject.after(Arrays.asList(module1, module2));
+        System.out.println(result);
+        int pos = result.indexOf(LABEL);
+        assertFalse("Should not be -1", pos == -1);
+        assertEquals("No more labels should be present", -1, result.indexOf(LABEL, pos + 1));
     }
 }

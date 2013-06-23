@@ -25,13 +25,15 @@ import java.util.List;
  */
 public class NoopVersionControl implements VersionControl {
     @Override
-    public void before(List<Module> modules) {
+    public String before(List<Module> modules) {
         // Do nothing.
+        return null;
     }
 
     @Override
-    public void after(List<Module> modules) {
+    public String after(List<Module> modules) {
         // Do nothing.
+        return null;
     }
 
     @Override

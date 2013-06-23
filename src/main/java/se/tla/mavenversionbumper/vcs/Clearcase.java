@@ -10,7 +10,6 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.TreeSet;
 
-
 import org.apache.commons.exec.CommandLine;
 import se.tla.mavenversionbumper.Module;
 
@@ -54,31 +53,53 @@ public class Clearcase extends AbstractVersionControl {
     }
 
     /**
-     * {@inheritDoc}
+     * Performs a sanity check on the modules labels (if any) and if ok checks out the modules.
+     *
+     * This is according to IBM cleartool reference documentation.
+     *
+     * @return null since no output is wanted.
+     * @throws IllegalArgumentException If any label contains illegal characters.
      */
     @Override
-    public void before(List<Module> modules) {
+    public String before(List<Module> modules) {
+        for (Module module : modules) {
+            String label = module.label();
+            if (label.replaceAll("[-A-Za-z0-9_.]", "").length() > 0) {
+                throw new IllegalArgumentException("Illegal characters in label: " + label);
+            }
+            if (label.startsWith("-")) {
+                throw new IllegalArgumentException("Labels cant start with hyphen ('-')");
+            }
+        }
         for (Module module: modules) {
             checkout(module);
         }
+        return null;
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void after(List<Module> modules) {
-        StringBuilder sb = new StringBuilder();
+    public String after(List<Module> modules) {
+        // Remove duplicate label names.
+        Set<String> labels = new TreeSet<String>();
         for (Module module : modules) {
             String label = module.label();
             if (label != null && label.length() > 0) {
-                sb.append("element * ").append(label).append("\n");
+                labels.add(label);
             }
         }
-        if (sb.length() > 0) {
-            System.out.println("element * CHECKEDOUT");
-            System.out.print(sb.toString());
-            System.out.println("element * /main/LATEST");
+        if (! labels.isEmpty()) {
+            StringBuilder sb = new StringBuilder();
+            sb.append("element * CHECKEDOUT\n");
+            for (String label : labels) {
+                sb.append("element * ").append(label).append("\n");
+            }
+            sb.append("element * /main/LATEST\n");
+            return sb.toString();
+        } else {
+            return null;
         }
     }
 

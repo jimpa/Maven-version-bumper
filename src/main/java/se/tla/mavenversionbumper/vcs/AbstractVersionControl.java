@@ -42,16 +42,18 @@ public abstract class AbstractVersionControl implements VersionControl {
      * {@inheritDoc}
      */
     @Override
-    public void before(List<Module> modules) {
+    public String before(List<Module> modules) {
         // Default is to do nothing.
+        return null;
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void after(List<Module> modules) {
+    public String after(List<Module> modules) {
         // Default is to do nothing.
+        return null;
     }
 
     /**

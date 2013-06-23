@@ -28,14 +28,16 @@ public interface VersionControl {
     /**
      * Called before any work is done in the Version Control.
      * @param modules Modules to prepare for.
+     * @return Output to print back to the caller. null means nothing to print.
      */
-    void before(List<Module> modules);
+    String before(List<Module> modules);
 
     /**
      * Called after all other work is done in the Version Control.
      * @param modules Modules that has been handled by the Version Control.
+     * @return Output to print back to the caller. null means nothing to print.
      */
-    void after(List<Module> modules);
+    String after(List<Module> modules);
 
     /**
      * Use the Version Control System to revert any changes made to these modules.

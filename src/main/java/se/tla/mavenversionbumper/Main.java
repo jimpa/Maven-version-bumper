@@ -255,7 +255,10 @@ public class Main {
             }
 
             if (type.equals(TYPE.NORMAL) || type.equals(TYPE.PREPARETEST)) {
-                versionControl.before(modulesLoadedForUpdate);
+                String beforeOutput = versionControl.before(modulesLoadedForUpdate);
+                if (beforeOutput != null) {
+                    System.out.println(beforeOutput);
+                }
 
                 // Save
                 for (Module module : modulesLoadedForUpdate) {
@@ -266,7 +269,10 @@ public class Main {
             if (type.equals(TYPE.NORMAL)) {
                 versionControl.commit(modulesLoadedForUpdate);
                 versionControl.label(modulesLoadedForUpdate);
-                versionControl.after(modulesLoadedForUpdate);
+                String afterOutput = versionControl.after(modulesLoadedForUpdate);
+                if (afterOutput != null) {
+                    System.out.println(afterOutput);
+                }
             }
 
             if (type.equals(TYPE.REVERT)) {
