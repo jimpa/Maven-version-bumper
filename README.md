@@ -74,7 +74,7 @@ syntax, a DSL if you like, for the task of defining what versions that should ge
 It also has a simple integration towards version control so that you can automate the committing of pom.xml-files
 and tagging of the modules at the same time.
 
-Besides this the tools tries to makes as few dependencies of its own on its environment. If you need integration with
-an Issue Management System, you have to do it outside this tool. Connection to you build server? Same thing.
+Besides this, the tools tries to makes as few dependencies of its own on its environment. If you need integration with
+an Issue Management System, you have to do it outside this tool. Connection to your build server? Same thing.
 
 Do a few things, and do them well.
